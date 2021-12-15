@@ -37,9 +37,9 @@
       >
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="form.type" size="mini" style="width: 178px">
-            <el-radio-button label="0">目录</el-radio-button>
-            <el-radio-button label="1">菜单</el-radio-button>
-            <el-radio-button label="2">按钮</el-radio-button>
+            <el-radio-button label="1">目录</el-radio-button>
+            <el-radio-button label="2">菜单</el-radio-button>
+            <el-radio-button label="3">按钮</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item
@@ -185,6 +185,9 @@
           />
         </el-form-item>
         <el-form-item
+          v-show="
+            form.iframe.toString() !== 'true' && form.type.toString() !== '1'
+          "
           label="后台URL"
           prop="linkUrl"
         >
@@ -211,7 +214,8 @@
           :loading="crud.status.cu === 2"
           type="primary"
           @click="crud.submitCU"
-        >确认</el-button>
+        >确认
+        </el-button>
       </div>
     </el-dialog>
     <!--表格渲染-->
@@ -314,7 +318,7 @@ const defaultForm = {
   componentName: null,
   iframe: false,
   roles: [],
-  pId: '0',
+  pId: null,
   icon: null,
   cache: false,
   hidden: false,
@@ -351,8 +355,8 @@ export default {
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        path: [{ required: true, message: '请输入地址', trigger: 'blur' }],
-        linkUrl: [{ required: true, message: '请输入服务端URL', trigger: 'blur' }]
+        path: [{ required: true, message: '请输入地址', trigger: 'blur' }]
+        // linkUrl: [{ required: true, message: '请输入服务端URL', trigger: 'blur' }]
       }
     }
   },
@@ -378,7 +382,6 @@ export default {
       }, 100)
     },
     getSupDepts(id) {
-      debugger
       crudMenu.getMenuSuperior(id).then((res) => {
         const children = res.map(function(obj) {
           if (!obj.leaf && !obj.children) {
@@ -416,6 +419,7 @@ export default {
 ::v-deep .el-input-number .el-input__inner {
   text-align: left;
 }
+
 ::v-deep .vue-treeselect__control,
 ::v-deep .vue-treeselect__placeholder,
 ::v-deep .vue-treeselect__single-value {
