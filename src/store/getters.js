@@ -12,6 +12,7 @@ const getters = {
   addRouters: state => state.permission.addRouters,
   baseApi: state => state.api.baseApi,
   updateAvatarApi: state => state.api.updateAvatarApi,
+  fileUploadApi: state => state.api.fileUploadApi,
   sidebarRouters: state => state.permission.sidebarRouters
 }
 export default getters

@@ -4,6 +4,8 @@ const api = {
   state: {
     // 修改头像
     updateAvatarApi: baseUrl + '/api/user/update/avatar',
+    // 文件上传
+    fileUploadApi: baseUrl + '/api/storage',
     // baseUrl，
     baseApi: baseUrl
   }
