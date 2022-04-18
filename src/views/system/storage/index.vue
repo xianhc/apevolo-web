@@ -57,7 +57,7 @@
       <el-table-column prop="description" label="文件描述">
         <template slot-scope="scope">
           <el-popover
-            :content="'/static/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
+            :content="'/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
             placement="top-start"
             title="路径"
             width="200"
@@ -65,7 +65,7 @@
           >
             <a
               slot="reference"
-              :href="baseApi + '/static/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
+              :href="baseApi + '/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
               class="el-link--primary"
               style="word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color: #1890ff;font-size: 13px;"
               target="_blank"
@@ -78,8 +78,8 @@
       <el-table-column prop="path" label="预览图">
         <template slot-scope="{row}">
           <el-image
-            :src=" baseApi + '/static/file/' + row.contentTypeNameEn + '/' + row.newName"
-            :preview-src-list="[baseApi + '/static/file/' + row.contentTypeNameEn + '/' + row.newName]"
+            :src=" baseApi + '/file/' + row.contentTypeNameEn + '/' + row.newName"
+            :preview-src-list="[baseApi + '/file/' + row.contentTypeNameEn + '/' + row.newName]"
             fit="contain"
             lazy
             class="el-avatar"
@@ -163,10 +163,10 @@ export default {
     },
     beforeUpload(file) {
       let isTrue = true
-      isTrue = file.size / 1024 / 1024 < 100
+      isTrue = file.size / 1024 / 1024 < 10
       if (!isTrue) {
         this.loading = false
-        this.$message.error('上传文件大小不能超过 100MB!')
+        this.$message.error('上传文件大小不能超过 10MB!')
       }
       if (this.form.description === '') {
         isTrue = false
