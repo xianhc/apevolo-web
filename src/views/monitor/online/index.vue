@@ -13,9 +13,10 @@
         />
         <rrOperation />
       </div>
-      <crudOperation>
+      <crudOperation show="" :permission="permission">
         <el-button
           slot="left"
+          v-permission="['admin']"
           class="filter-item"
           type="danger"
           icon="el-icon-delete"
