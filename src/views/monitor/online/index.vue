@@ -93,7 +93,9 @@ export default {
   data() {
     return {
       delLoading: false,
-      permission: {}
+      permission: {
+        down: ['admin']
+      }
     }
   },
   created() {
