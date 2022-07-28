@@ -43,7 +43,10 @@
       <el-table-column prop="dept" label="所属部门" />
       <el-table-column prop="ip" label="登录IP" />
       <el-table-column prop="address" label="IP地址" />
-      <el-table-column prop="browser" label="浏览器" />
+      <el-table-column prop="operatingSystem" label="操作系统" />
+      <el-table-column prop="deviceType" label="设备类型" />
+      <el-table-column prop="browserName" label="浏览器" />
+      <el-table-column prop="version" label="版本号" />
       <el-table-column prop="loginTime" label="登录时间" />
       <el-table-column label="操作" width="70px" fixed="right">
         <template slot-scope="scope">

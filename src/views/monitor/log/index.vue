@@ -28,12 +28,15 @@
         prop="ipAddress"
         label="IP来源"
       />
+      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="operatingSystem" label="操作系统" />
+      <el-table-column prop="deviceType" label="设备类型" />
+      <el-table-column prop="browserName" label="浏览器" />
+      <el-table-column prop="version" label="版本号" />
       <el-table-column prop="area" label="区域" />
       <el-table-column prop="controller" label="控制器" />
       <el-table-column prop="action" label="方法名称" />
       <el-table-column prop="method" label="请求类型" />
-      <el-table-column prop="description" label="描述" />
-      <el-table-column prop="browserInfo" label="浏览器" />
       <el-table-column prop="createTime" label="创建日期" width="180px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -74,7 +77,7 @@ export default {
   name: 'Log',
   components: { Search, crudOperation, pagination },
   cruds() {
-    return CRUD({ title: '异常日志', url: 'api/log/query' })
+    return CRUD({ title: '异常日志', url: 'api/exception/query' })
   },
   mixins: [presenter()],
   data() {

@@ -63,10 +63,8 @@
             <!--    操作日志    -->
             <el-tab-pane label="行为日志" name="second">
               <el-table v-loading="loading" :data="data" style="width: 100%;">
-                <el-table-column prop="description" label="行为" />
                 <el-table-column prop="requestIp" label="IP" />
-                <el-table-column :show-overflow-tooltip="true" prop="ipAddress" label="IP来源" />
-                <el-table-column prop="browserInfo" label="浏览器" />
+                <el-table-column prop="description" label="行为" />
                 <el-table-column prop="executionDuration" label="请求耗时" align="center">
                   <template slot-scope="scope">
                     <el-tag v-if="scope.row.executionDuration <= 300" type="success">{{ scope.row.executionDuration }}ms</el-tag>
@@ -74,6 +72,11 @@
                     <el-tag v-else type="danger">{{ scope.row.executionDuration }}ms</el-tag>
                   </template>
                 </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" prop="ipAddress" label="IP来源" />
+                <el-table-column prop="operatingSystem" label="操作系统" />
+                <el-table-column prop="deviceType" label="设备类型" />
+                <el-table-column prop="browserName" label="浏览器" />
+                <el-table-column prop="version" label="版本号" />
                 <el-table-column
                   align="right"
                 >

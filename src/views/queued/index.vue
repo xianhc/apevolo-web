@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import crudQueuedEmail from '@/api/message/queuedEmail'
+import crudQueuedEmail from '@/api/queued/queuedEmail'
 import eHeader from './header'
 import eForm from './form'
 import CRUD, { presenter } from '@crud/crud'
@@ -129,7 +129,7 @@ export default {
   cruds: function() {
     return CRUD({
       title: '电子邮件队列',
-      url: 'api/email/queued/query',
+      url: 'api/queued/email/query',
       crudMethod: { ...crudQueuedEmail },
       optShow: {
         add: true,
