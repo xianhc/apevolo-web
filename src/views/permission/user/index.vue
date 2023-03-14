@@ -100,6 +100,7 @@
             <el-form-item label="岗位" prop="jobs">
               <el-select
                 v-model="jobDatas"
+                value-key="id"
                 style="width: 178px"
                 multiple
                 placeholder="请选择"
@@ -108,9 +109,9 @@
               >
                 <el-option
                   v-for="item in jobs"
-                  :key="item.name"
+                  :key="item.id"
                   :label="item.name"
-                  :value="item.id"
+                  :value="item"
                 />
               </el-select>
             </el-form-item>
@@ -135,6 +136,7 @@
             <el-form-item style="margin-bottom: 0" label="角色" prop="roles">
               <el-select
                 v-model="roleDatas"
+                value-key="id"
                 style="width: 437px"
                 multiple
                 placeholder="请选择"
@@ -143,10 +145,10 @@
               >
                 <el-option
                   v-for="item in roles"
-                  :key="item.name"
+                  :key="item.id"
                   :disabled="level !== 1 && item.level <= level"
                   :label="item.name"
-                  :value="item.id"
+                  :value="item"
                 />
               </el-select>
             </el-form-item>
@@ -269,7 +271,7 @@ const defaultForm = {
   nickName: null,
   gender: '男',
   email: null,
-  enabled: 'false',
+  enabled: 'true',
   roles: [],
   jobs: [],
   dept: { id: null },
@@ -371,14 +373,14 @@ export default {
     changeRole(value) {
       userRoles = []
       value.forEach(function(data, index) {
-        const role = { id: data }
+        const role = { id: data.id, name: data.name, permission: data.permission }
         userRoles.push(role)
       })
     },
     changeJob(value) {
       userJobs = []
       value.forEach(function(data, index) {
-        const job = { id: data }
+        const job = { id: data.id, name: data.name }
         userJobs.push(job)
       })
     },
@@ -408,20 +410,21 @@ export default {
     },
     // 初始化编辑时候的角色与岗位
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      this.getJobs(this.form.dept.id)
+      // this.getJobs(this.form.dept.id)
+      this.getJobs()
       this.jobDatas = []
       this.roleDatas = []
       userRoles = []
       userJobs = []
       const _this = this
       form.roles.forEach(function(role, index) {
-        _this.roleDatas.push(role.id)
-        const rol = { id: role.id }
+        _this.roleDatas.push({ id: role.id, name: role.name })
+        const rol = { id: role.id, name: role.name }
         userRoles.push(rol)
       })
       form.jobs.forEach(function(job, index) {
-        _this.jobDatas.push(job.id)
-        const data = { id: job.id }
+        _this.jobDatas.push({ id: job.id, name: job.name })
+        const data = { id: job.id, name: job.name }
         userJobs.push(data)
       })
     },

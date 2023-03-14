@@ -173,8 +173,8 @@ const defaultForm = {
   port: null,
   username: null,
   password: null,
-  enableSsl: null,
-  useDefaultCredentials: null
+  enableSsl: false,
+  useDefaultCredentials: false
 }
 export default {
   name: 'EmailAccount',

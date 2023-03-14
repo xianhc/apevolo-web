@@ -36,7 +36,8 @@ export function editUser(data) {
 export function updatePass(user) {
   const data = {
     oldPassword: encrypt(user.oldPass),
-    newPassword: encrypt(user.newPass)
+    newPassword: encrypt(user.newPass),
+    confirmPassword: encrypt(user.confirmPass)
   }
   return request({
     url: 'api/user/update/password',

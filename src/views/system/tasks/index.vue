@@ -42,7 +42,7 @@
         <el-form-item label="程序集" prop="assemblyName">
           <el-input v-model="form.assemblyName" style="width: 220px" />
         </el-form-item>
-        <el-form-item label="任务名称" prop="jobName">
+        <el-form-item label="任务名称" prop="taskName">
           <el-input v-model="form.taskName" style="width: 220px" />
         </el-form-item>
         <el-form-item label="任务描述" prop="description">

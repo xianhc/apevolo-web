@@ -36,7 +36,6 @@
         />
       </el-form-item>
       <el-form-item
-        v-if="form.pid !== 0"
         label="状态"
         prop="enabled"
       >

@@ -14,12 +14,12 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code">
-        <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%" @keyup.enter.native="handleLogin">
+      <el-form-item prop="captcha">
+        <el-input v-model="loginForm.captcha" auto-complete="off" placeholder="验证码" style="width: 63%" @keyup.enter.native="handleLogin">
           <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
         </el-input>
         <div class="login-code">
-          <img :src="codeUrl" @click="getCode">
+          <img :src="codeUrl" @click="getCaptcha">
         </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">
@@ -44,7 +44,7 @@
 <script>
 import { encrypt } from '@/utils/rsaEncrypt'
 import Config from '@/settings'
-import { getCodeImg } from '@/api/login'
+import { getCaptcha } from '@/api/login'
 import Cookies from 'js-cookie'
 import qs from 'qs'
 import Background from '@/assets/images/background.png'
@@ -59,13 +59,13 @@ export default {
         username: 'apevolo',
         password: '123456',
         rememberMe: false,
-        code: '',
-        uuid: ''
+        captcha: '',
+        captchaId: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
         password: [{ required: true, trigger: 'blur', message: '密码不能为空' }],
-        code: [{ required: true, trigger: 'change', message: '验证码不能为空' }]
+        captcha: [{ required: true, trigger: 'change', message: '验证码不能为空' }]
       },
       loading: false,
       redirect: undefined
@@ -88,17 +88,17 @@ export default {
   },
   created() {
     // 获取验证码
-    this.getCode()
+    this.getCaptcha()
     // 获取用户名密码等Cookie
     this.getCookie()
     // token 过期提示
     this.point()
   },
   methods: {
-    getCode() {
-      getCodeImg().then(res => {
+    getCaptcha() {
+      getCaptcha().then(res => {
         this.codeUrl = res.img
-        this.loginForm.uuid = res.uuid
+        this.loginForm.captchaId = res.captchaId
       })
     },
     getCookie() {
@@ -112,7 +112,7 @@ export default {
         username: username === undefined ? this.loginForm.username : username,
         password: password,
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
-        code: ''
+        captcha: ''
       }
     },
     handleLogin() {
@@ -121,8 +121,8 @@ export default {
           username: this.loginForm.username,
           password: this.loginForm.password,
           rememberMe: this.loginForm.rememberMe,
-          code: this.loginForm.code,
-          uuid: this.loginForm.uuid
+          captcha: this.loginForm.captcha,
+          captchaId: this.loginForm.captchaId
         }
         if (user.password !== this.cookiePass) {
           user.password = encrypt(user.password)
@@ -143,7 +143,7 @@ export default {
             this.$router.push({ path: this.redirect || '/' })
           }).catch(() => {
             this.loading = false
-            this.getCode()
+            this.getCaptcha()
           })
         } else {
           console.log('error submit!!')

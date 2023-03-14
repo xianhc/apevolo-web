@@ -144,9 +144,9 @@ export default {
   data() {
     return {
       permission: {
-        add: ['queuedEmail:add'],
-        edit: ['queuedEmail:edit'],
-        del: ['queuedEmail:del']
+        add: ['queuedEmail_add'],
+        edit: ['queuedEmail_edit'],
+        del: ['queuedEmail_del']
       },
       sendBody: '',
       bodyDialog: false

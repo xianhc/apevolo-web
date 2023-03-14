@@ -79,7 +79,7 @@ const defaultForm = {
   bccEmailAddresses: null,
   subject: null,
   body: null,
-  isActive: null,
+  isActive: false,
   emailAccountId: null
 }
 

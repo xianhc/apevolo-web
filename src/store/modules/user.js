@@ -30,7 +30,7 @@ const user = {
     Login({ commit }, userInfo) {
       const rememberMe = userInfo.rememberMe
       return new Promise((resolve, reject) => {
-        login(userInfo.username, userInfo.password, userInfo.code, userInfo.uuid).then(res => {
+        login(userInfo.username, userInfo.password, userInfo.captcha, userInfo.captchaId).then(res => {
           setToken(res.token, rememberMe)
           commit('SET_TOKEN', res.token)
           setUserInfo(res.user, commit)
