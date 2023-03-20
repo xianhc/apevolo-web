@@ -1,7 +1,6 @@
 import request from '@/utils/request'
 
 export function del(keys) {
-  debugger
   const idCollection = { idArray: [] }
   if (keys instanceof Array) {
     keys.forEach(val => {
