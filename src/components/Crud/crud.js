@@ -294,14 +294,14 @@ function CRUD(options) {
     doDelete(data) {
       let delAll = false
       let dataStatus
-      const ids = []
+      const idCollection = { idArray: [] }
       if (data instanceof Array) {
         delAll = true
         data.forEach(val => {
-          ids.push(this.getDataId(val))
+          idCollection.idArray.push(this.getDataId(val))
         })
       } else {
-        ids.push(this.getDataId(data))
+        idCollection.idArray.push(this.getDataId(data))
         dataStatus = crud.getDataStatus(this.getDataId(data))
       }
       if (!callVmHook(crud, CRUD.HOOK.beforeDelete, data)) {
@@ -310,7 +310,7 @@ function CRUD(options) {
       if (!delAll) {
         dataStatus.delete = CRUD.STATUS.PROCESSING
       }
-      return crud.crudMethod.del(ids).then(() => {
+      return crud.crudMethod.del(idCollection).then(() => {
         if (delAll) {
           crud.delAllLoading = false
         } else dataStatus.delete = CRUD.STATUS.PREPARED
@@ -406,8 +406,8 @@ function CRUD(options) {
           Vue.set(crudFrom, key, form[key])
         }
       }
-      // add by ghl 2020-10-04  页面重复添加信息时，下拉框的校验会存在，需要找工取消
       if (crud.findVM('form').$refs['form']) {
+        // 页面重复添加信息时，下拉框的校验会存在，需要找工取消
         crud.findVM('form').$refs['form'].clearValidate()
       }
     },

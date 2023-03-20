@@ -15,12 +15,12 @@ export function getMenus(params) {
   })
 }
 
-export function getMenuSuperior(ids) {
-  const data = ids.constructor === Array ? ids : Array.of(ids)
+export function getMenuSuperior(id) {
+  const idCollection = { idArray: [id] }
   return request({
     url: 'api/menu/superior',
     method: 'post',
-    data
+    data: idCollection
   })
 }
 

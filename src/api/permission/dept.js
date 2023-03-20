@@ -8,12 +8,12 @@ export function getDepts(params) {
   })
 }
 
-export function getDeptSuperior(ids) {
-  const data = ids.constructor === Array ? ids : Array.of(ids)
+export function getDeptSuperior(id) {
+  const idCollection = { idArray: [id] }
   return request({
     url: 'api/dept/superior',
     method: 'post',
-    data
+    data: idCollection
   })
 }
 
