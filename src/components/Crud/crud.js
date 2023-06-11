@@ -330,7 +330,7 @@ function CRUD(options) {
     doExport() {
       crud.downloadLoading = true
       download(crud.url.replace('query', 'download'), crud.getQueryParams()).then(result => {
-        downloadFile(result, crud.title + '数据', 'xlsx')
+        downloadFile(result, crud.title + '数据')
         crud.downloadLoading = false
       }).catch(() => {
         crud.downloadLoading = false

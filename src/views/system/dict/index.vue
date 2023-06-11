@@ -171,7 +171,7 @@ export default {
         add: ['dict_add'],
         edit: ['dict_edit'],
         del: ['dict_del'],
-        down: ['dic_down']
+        down: ['dict_down']
       }
     }
   },
