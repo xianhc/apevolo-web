@@ -38,7 +38,8 @@
       @selection-change="crud.selectionChangeHandler"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="userName" label="登录账号" />
+      <el-table-column prop="account" label="登录账号" />
+      <el-table-column prop="accessToken" label="令牌" />
       <el-table-column prop="nickName" label="用户昵称" />
       <el-table-column prop="dept" label="所属部门" />
       <el-table-column prop="ip" label="登录IP" />
@@ -67,7 +68,7 @@
                 :loading="delLoading"
                 type="primary"
                 size="mini"
-                @click="delMethod(scope.row.key, scope.$index)"
+                @click="delMethod(scope.row.accessToken, scope.$index)"
               >确定</el-button>
             </div>
             <el-button slot="reference" size="mini" type="text">强退</el-button>
@@ -124,13 +125,13 @@ export default {
         .catch(() => {})
     },
     // 强退用户
-    delMethod(key, index) {
+    delMethod(accessToken, index) {
       const ids = []
-      if (key instanceof Array) {
-        key.forEach((val) => {
-          ids.push(val.key)
+      if (accessToken instanceof Array) {
+        accessToken.forEach((val) => {
+          ids.push(val.accessToken)
         })
-      } else ids.push(key)
+      } else ids.push(accessToken)
       this.delLoading = true
       del(ids)
         .then(() => {

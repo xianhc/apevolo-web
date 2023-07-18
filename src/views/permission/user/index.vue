@@ -455,14 +455,14 @@ export default {
     },
     // 获取左侧部门数据
     getDeptDatas(node, resolve) {
-      const sort = 'id,desc'
-      const params = { sort: sort }
+      const sort = 'sort asc'
+      const params = { SortFields: sort }
       if (typeof node !== 'object') {
         if (node) {
           params['name'] = node
         }
       } else if (node.level !== 0) {
-        params['pid'] = node.data.id
+        params['parentId'] = node.data.id
       }
       setTimeout(() => {
         getDepts(params).then((res) => {
@@ -504,7 +504,7 @@ export default {
     // 获取弹窗内部门数据
     loadDepts({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        getDepts({ enabled: true, pid: parentNode.id }).then((res) => {
+        getDepts({ enabled: true, parentId: parentNode.id }).then((res) => {
           parentNode.children = res.content.map(function(obj) {
             if (obj.hasChildren) {
               obj.children = null
@@ -519,7 +519,7 @@ export default {
     },
     // 切换部门
     handleNodeClick(data) {
-      if (data.pid === 0) {
+      if (data.parentId === 0) {
         this.query.deptId = null
       } else {
         this.query.deptId = data.id

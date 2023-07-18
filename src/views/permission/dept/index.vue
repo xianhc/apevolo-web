@@ -81,10 +81,10 @@
           v-if="form.isTop === '0'"
           style="margin-bottom: 0"
           label="上级部门"
-          prop="pId"
+          prop="parentId"
         >
           <treeselect
-            v-model="form.pId"
+            v-model="form.parentId"
             :load-options="loadDepts"
             :options="depts"
             style="width: 370px"
@@ -165,7 +165,7 @@ const defaultForm = {
   name: null,
   isTop: '1',
   subCount: 0,
-  pId: null,
+  parentId: null,
   sort: 999,
   enabled: 'true'
 }
@@ -216,7 +216,7 @@ export default {
   },
   methods: {
     getDeptDatas(tree, treeNode, resolve) {
-      const params = { pId: tree.id }
+      const params = { parentId: tree.id }
       setTimeout(() => {
         crudDept.getDepts(params).then((res) => {
           resolve(res.content)
@@ -225,7 +225,7 @@ export default {
     },
     // 新增与编辑前做的操作
     [CRUD.HOOK.afterToCU](crud, form) {
-      if (form.pId !== null) {
+      if (form.parentId !== null) {
         form.isTop = '0'
       } else if (form.id !== null) {
         form.isTop = '1'
@@ -267,7 +267,7 @@ export default {
     // 获取弹窗内部门数据
     loadDepts({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        crudDept.getDepts({ enabled: true, pId: parentNode.id }).then((res) => {
+        crudDept.getDepts({ enabled: true, parentId: parentNode.id }).then((res) => {
           parentNode.children = res.content.map(function(obj) {
             if (obj.hasChildren) {
               obj.children = null
@@ -282,7 +282,7 @@ export default {
     },
     // 提交前的验证
     [CRUD.HOOK.afterValidateCU]() {
-      if (this.form.pId !== null && this.form.pId === this.form.id) {
+      if (this.form.parentId !== null && this.form.parentId === this.form.id) {
         this.$message({
           message: '上级部门不能为空',
           type: 'warning'
@@ -290,7 +290,7 @@ export default {
         return false
       }
       if (this.form.isTop === '1') {
-        this.form.pId = null
+        this.form.parentId = null
       }
       return true
     },

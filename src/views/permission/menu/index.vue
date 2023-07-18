@@ -149,9 +149,9 @@
             style="width: 178px"
           />
         </el-form-item>
-        <el-form-item label="菜单排序" prop="menuSort">
+        <el-form-item label="菜单排序" prop="sort">
           <el-input-number
-            v-model.number="form.menuSort"
+            v-model.number="form.sort"
             :min="0"
             :max="999"
             controls-position="right"
@@ -198,9 +198,9 @@
             placeholder="服务端URL路径"
           />
         </el-form-item>
-        <el-form-item label="上级类目" prop="pId">
+        <el-form-item label="上级类目" prop="parentId">
           <treeselect
-            v-model="form.pId"
+            v-model="form.parentId"
             :options="menus"
             :load-options="loadMenus"
             style="width: 450px"
@@ -243,9 +243,9 @@
           <svg-icon :icon-class="scope.row.icon ? scope.row.icon : ''" />
         </template>
       </el-table-column>
-      <el-table-column prop="menuSort" align="center" label="排序">
+      <el-table-column prop="sort" align="center" label="排序">
         <template slot-scope="scope">
-          {{ scope.row.menuSort }}
+          {{ scope.row.sort }}
         </template>
       </el-table-column>
       <el-table-column
@@ -312,13 +312,13 @@ import DateRangePicker from '@/components/DateRangePicker'
 const defaultForm = {
   id: null,
   title: null,
-  menuSort: 999,
+  sort: 999,
   path: null,
   component: null,
   componentName: null,
   iframe: false,
   roles: [],
-  pId: 0,
+  parentId: 0,
   subCount: 0,
   icon: null,
   cache: false,
@@ -366,8 +366,8 @@ export default {
     [CRUD.HOOK.afterToCU](crud, form) {
       this.menus = []
       if (form.id != null) {
-        // if (form.pId === null) {
-        //   form.pId = 0
+        // if (form.parentId === null) {
+        //   form.parentId = 0
         // }
         this.getSupDepts(form.id)
       } else {
@@ -375,7 +375,7 @@ export default {
       }
     },
     getMenus(tree, treeNode, resolve) {
-      const params = { pId: tree.id }
+      const params = { parentId: tree.id }
       setTimeout(() => {
         crudMenu.getMenus(params).then((res) => {
           resolve(res.content)
