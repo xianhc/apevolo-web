@@ -48,7 +48,6 @@
         </el-table-column>
       </el-table>
       <!--分页组件-->
-      <pagination />
     </div>
   </div>
 </template>
@@ -56,18 +55,17 @@
 <script>
 import crudDictDetail from '@/api/system/dictDetail'
 import CRUD, { presenter, header, form } from '@crud/crud'
-import pagination from '@crud/Pagination'
 import rrOperation from '@crud/RR.operation'
 import udOperation from '@crud/UD.operation'
 
 const defaultForm = { id: null, label: null, value: null, dictSort: 999 }
 
 export default {
-  components: { pagination, rrOperation, udOperation },
+  components: { rrOperation, udOperation },
   cruds() {
     return [
-      CRUD({ title: '字典详情', url: 'api/dictDetail', query: { dictName: '' }, sort: ['dictSort,asc', 'id,desc'],
-        crudMethod: { ...crudDictDetail },
+      CRUD({ title: '字典详情', url: 'api/dictDetail/query', query: { dictName: '' },
+        crudMethod: { ...crudDictDetail }, pagination: null,
         optShow: {
           add: true,
           edit: true,
