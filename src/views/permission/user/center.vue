@@ -9,7 +9,7 @@
           <div>
             <div style="text-align: center">
               <div class="el-upload">
-                <img :src="user.avatarName ? baseApi + user.avatarPath + user.avatarName : Avatar" title="点击上传头像" class="avatar" @click="toggleShow">
+                <img :src="user.avatarPath ? baseApi + user.avatarPath : Avatar" title="点击上传头像" class="avatar" alt="用户头像" @click="toggleShow">
                 <myUpload
                   v-model="show"
                   :headers="headers"
@@ -90,8 +90,8 @@
               </el-table>
               <!--分页组件-->
               <el-pagination
-                :total="total"
-                :current-page="page"
+                :total="totalElements"
+                :current-page="pageIndex"
                 style="margin-top: 8px;"
                 layout="total, prev, pager, next, sizes"
                 @size-change="sizeChange"

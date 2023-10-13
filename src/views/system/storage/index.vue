@@ -57,7 +57,7 @@
       <el-table-column prop="description" label="文件描述">
         <template slot-scope="scope">
           <el-popover
-            :content="'/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
+            :content="scope.row.filePath"
             placement="top-start"
             title="路径"
             width="200"
@@ -65,7 +65,7 @@
           >
             <a
               slot="reference"
-              :href="baseApi + '/file/' + scope.row.contentTypeNameEn + '/' + scope.row.newName"
+              :href="baseApi +scope.row.filePath"
               class="el-link--primary"
               style="word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color: #1890ff;font-size: 13px;"
               target="_blank"
@@ -78,8 +78,8 @@
       <el-table-column prop="path" label="预览图">
         <template slot-scope="{row}">
           <el-image
-            :src=" baseApi + '/file/' + row.contentTypeNameEn + '/' + row.newName"
-            :preview-src-list="[baseApi + '/file/' + row.contentTypeNameEn + '/' + row.newName]"
+            :src=" baseApi + row.filePath"
+            :preview-src-list="[baseApi +row.filePath]"
             fit="contain"
             lazy
             class="el-avatar"
