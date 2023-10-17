@@ -41,7 +41,7 @@
       <el-table-column prop="account" label="登录账号" />
       <el-table-column prop="accessToken" label="令牌" />
       <el-table-column prop="nickName" label="用户昵称" />
-      <el-table-column prop="dept" label="所属部门" />
+      <el-table-column prop="deptName" label="所属部门" />
       <el-table-column prop="ip" label="登录IP" />
       <el-table-column prop="address" label="IP地址" />
       <el-table-column prop="operatingSystem" label="操作系统" />
