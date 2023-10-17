@@ -74,7 +74,7 @@
             v-for="item in dict.dept_status"
             :key="item.id"
             v-model="form.enabled"
-            :label="item.value"
+            :label="item.value === 'true'"
           >{{ item.label }}</el-radio>
         </el-form-item>
         <el-form-item
@@ -165,9 +165,9 @@ const defaultForm = {
   name: null,
   isTop: '1',
   subCount: 0,
-  parentId: null,
+  parentId: '0',
   sort: 999,
-  enabled: 'true'
+  enabled: true
 }
 export default {
   name: 'Dept',
@@ -182,6 +182,7 @@ export default {
     return CRUD({
       title: '部门',
       url: 'api/dept/query',
+      sortFields: ['sort asc'],
       crudMethod: { ...crudDept }
     })
   },
@@ -225,12 +226,13 @@ export default {
     },
     // 新增与编辑前做的操作
     [CRUD.HOOK.afterToCU](crud, form) {
-      if (form.parentId !== null) {
+      if (form.parentId !== '0') {
         form.isTop = '0'
       } else if (form.id !== null) {
         form.isTop = '1'
+        form.parentId = null
       }
-      form.enabled = `${form.enabled}`
+      // form.enabled = `${form.enabled}`
       if (form.id != null) {
         this.getSupDepts(form.id)
       } else {
@@ -282,7 +284,7 @@ export default {
     },
     // 提交前的验证
     [CRUD.HOOK.afterValidateCU]() {
-      if (this.form.parentId !== null && this.form.parentId === this.form.id) {
+      if (this.form.parentId !== '0' && this.form.parentId === this.form.id) {
         this.$message({
           message: '上级部门不能为空',
           type: 'warning'
@@ -290,7 +292,7 @@ export default {
         return false
       }
       if (this.form.isTop === '1') {
-        this.form.parentId = null
+        this.form.parentId = '0'
       }
       return true
     },
