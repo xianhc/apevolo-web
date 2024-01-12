@@ -129,7 +129,7 @@
                 <el-radio
                   v-for="item in dict.user_status"
                   :key="item.id"
-                  :label="item.value"
+                  :label="item.value === 'true'"
                 >{{ item.label }}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -271,11 +271,11 @@ const defaultForm = {
   nickName: null,
   gender: '男',
   email: null,
-  enabled: 'true',
+  enabled: true,
   roles: [],
   jobs: [],
   dept: { id: null },
-  phone: null
+  phone: ''
 }
 export default {
   name: 'User',
@@ -401,7 +401,7 @@ export default {
       }
       this.getRoleLevel()
       this.getJobs()
-      form.enabled = form.enabled.toString()
+      // form.enabled = form.enabled
     },
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
@@ -451,6 +451,7 @@ export default {
       }
       crud.form.roles = userRoles
       crud.form.jobs = userJobs
+      crud.form.phone = crud.form.phone.toString()
       return true
     },
     // 获取左侧部门数据
