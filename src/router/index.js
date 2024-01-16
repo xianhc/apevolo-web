@@ -16,7 +16,7 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title + '-' + Config.title
   }
   NProgress.start()
-  if (getToken()) {
+  if (getToken() != null) {
     // 已登录且要跳转的页面是登录页
     if (to.path === '/login') {
       next({ path: '/' })
@@ -31,7 +31,7 @@ router.beforeEach((to, from, next) => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
           })
         })
-      // 登录时未拉取 菜单，在此处拉取
+        // 登录时未拉取 菜单，在此处拉取
       } else if (store.getters.loadMenus) {
         // 修改成false，防止死循环
         store.dispatch('updateLoadMenus')

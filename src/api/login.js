@@ -13,6 +13,16 @@ export function login(username, password, captcha, captchaId) {
   })
 }
 
+export function refreshToken(token) {
+  return request({
+    url: 'auth/refreshToken',
+    method: 'post',
+    data: {
+      token
+    }
+  })
+}
+
 export function getInfo() {
   return request({
     url: 'auth/info',

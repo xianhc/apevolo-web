@@ -2,7 +2,7 @@ module.exports = {
   /**
    * @description 网站标题
    */
-  title: 'ApeVolo快速开发框架',
+  title: 'ApeVolo框架',
   /**
    * @description 是否显示 tagsView
    */
@@ -12,21 +12,9 @@ module.exports = {
    */
   fixedHeader: true,
   /**
-   * @description 记住密码状态下的token在Cookie中存储的天数，默认1天
-   */
-  tokenCookieExpires: 1,
-  /**
-   * @description 记住密码状态下的密码在Cookie中存储的天数，默认1天s
-   */
-  passCookieExpires: 1,
-  /**
    * @description 是否只保持一个子菜单的展开
    */
   uniqueOpened: true,
-  /**
-   * @description token key
-   */
-  TokenKey: 'APEVOLO-TOEKN',
   /**
    * @description 请求超时时间，毫秒（默认2分钟）
    */
@@ -46,5 +34,5 @@ module.exports = {
   /**
    * 备案号
    */
-  caseNumber: '粤ICP备20072500号'
+  caseNumber: '粤ICP备2023033756号'
 }
