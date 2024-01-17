@@ -186,7 +186,7 @@ export default {
           if (valid) {
             this.saveLoading = true
             editUser(this.form).then(() => {
-              this.editSuccessNotify()
+              this.editSuccessMessage()
               store.dispatch('GetInfo').then(() => {})
               this.saveLoading = false
             }).catch(() => {

@@ -433,19 +433,22 @@ export default {
       if (!crud.form.dept.id) {
         this.$message({
           message: '部门不能为空',
-          type: 'warning'
+          type: 'warning',
+          center: true
         })
         return false
       } else if (this.jobDatas.length === 0) {
         this.$message({
           message: '岗位不能为空',
-          type: 'warning'
+          type: 'warning',
+          center: true
         })
         return false
       } else if (this.roleDatas.length === 0) {
         this.$message({
           message: '角色不能为空',
-          type: 'warning'
+          type: 'warning',
+          center: true
         })
         return false
       }
@@ -546,7 +549,7 @@ export default {
           crudUser
             .edit(data)
             .then((res) => {
-              this.crud.notify(
+              this.crud.message(
                 this.dict.label.user_status[val] + '成功',
                 CRUD.NOTIFICATION_TYPE.SUCCESS
               )

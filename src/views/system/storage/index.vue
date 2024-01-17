@@ -176,7 +176,7 @@ export default {
       return isTrue
     },
     handleSuccess(response, file, fileList) {
-      this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+      this.crud.message('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
       this.$refs.upload.clearFiles()
       this.crud.status.add = CRUD.STATUS.NORMAL
       this.crud.resetForm()
@@ -185,10 +185,11 @@ export default {
     // 监听上传失败
     handleError(e, file, fileList) {
       const msg = JSON.parse(e.message)
-      this.$notify({
-        title: msg.message,
+      this.$message({
+        message: msg.message,
         type: 'error',
-        duration: 2500
+        duration: 2500,
+        center: true
       })
       this.loading = false
     }

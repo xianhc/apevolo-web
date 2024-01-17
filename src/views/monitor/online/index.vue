@@ -140,7 +140,7 @@ export default {
             this.$refs[index].doClose()
           }
           this.crud.dleChangePage(1)
-          this.crud.delSuccessNotify()
+          this.crud.delSuccessMessage()
           this.crud.toQuery()
         })
         .catch(() => {

@@ -370,7 +370,7 @@ export default {
       crudRoles
         .editMenu(role)
         .then(() => {
-          this.crud.notify('保存成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.crud.message('保存成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
           this.menuLoading = false
           this.update()
         })

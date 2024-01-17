@@ -106,7 +106,7 @@ export default {
             .edit(data)
             .then(() => {
               // eslint-disable-next-line no-undef
-              this.crud.notify(
+              this.crud.message(
                 this.dict.label.setting_status[val] + '成功',
                 'success'
               )

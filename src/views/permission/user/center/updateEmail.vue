@@ -104,10 +104,11 @@ export default {
           updateEmail(this.form).then(res => {
             this.loading = false
             this.resetForm()
-            this.$notify({
-              title: '邮箱修改成功',
+            this.$message({
+              message: '邮箱修改成功',
               type: 'success',
-              duration: 1500
+              duration: 1500,
+              center: true
             })
             store.dispatch('GetInfo').then(() => {})
           }).catch(err => {

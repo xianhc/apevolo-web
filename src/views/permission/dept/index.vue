@@ -315,7 +315,7 @@ export default {
           crudDept
             .edit(data)
             .then((res) => {
-              this.crud.notify(
+              this.crud.message(
                 this.dict.label.dept_status[val] + '成功',
                 CRUD.NOTIFICATION_TYPE.SUCCESS
               )

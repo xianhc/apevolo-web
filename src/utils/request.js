@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Notification } from 'element-ui'
+import { Message } from 'element-ui'
 import store from '../store'
 import { getRefreshTokenExpires, getToken, getTokenExpire, getTokenType, setToken } from '@/utils/auth'
 import { refreshToken } from '@/api/login'
@@ -48,14 +48,16 @@ service.interceptors.response.use(
       reader.readAsText(error.response.data, 'utf-8')
       reader.onload = function(e) {
         errorMsg = JSON.parse(reader.result).message
-        Notification.error({
-          title: errorMsg,
-          duration: 5000
+        Message.error({
+          message: errorMsg,
+          duration: 5000,
+          center: true,
+          showClose: true
         })
       }
     } else {
       if (error.toString().indexOf('Error: timeout') !== -1) {
-        errorMsg = '网络请求超时'
+        errorMsg = '网络请求超时！'
       } else if (error.response) {
         code = error.response.status
         if (code === 400) {
@@ -68,19 +70,22 @@ service.interceptors.response.use(
           if (token !== null && refreshTokenExpires !== null && curTime < refreshTokenExpiresTime) {
             refreshToken(token).then(res => {
               if (res && res.hasOwnProperty('access_token')) {
-                Notification.success({
+                Message.success({
                   message: '重新授权完成，登录成功....',
-                  duration: 5000
+                  duration: 5000,
+                  center: true,
+                  showClose: true
                 })
                 setToken(res)
                 error.config.__isRetryRequest = true
                 error.config.headers['Authorization'] = getTokenType() + ' ' + res.access_token
                 return axios(error.config)
               } else {
-                Notification.warning({
-                  title: '提示',
+                Message.warning({
                   message: res.message,
-                  duration: 5000
+                  duration: 5000,
+                  center: true,
+                  showClose: true
                 })
                 window.localStorage.clear()
                 store.dispatch('LogOut').then(() => {
@@ -90,10 +95,11 @@ service.interceptors.response.use(
             })
           } else {
             window.localStorage.clear()
-            Notification.warning({
-              title: '提示',
+            Message.warning({
               message: '授权已过期，请重新登录！',
-              duration: 5000
+              duration: 5000,
+              center: true,
+              showClose: true
             })
             store.dispatch('LogOut').then(() => {
               location.reload()
@@ -102,7 +108,7 @@ service.interceptors.response.use(
         } else if (code === 403) {
           errorMsg = error.response.data.message
         } else if (code === 404) {
-          errorMsg = '请求失败，接口不存在'
+          errorMsg = '请求失败，接口不存在！'
         } else if (code === 429) {
           errorMsg = error.response.data.message
         } else if (code === 500) {
@@ -111,18 +117,21 @@ service.interceptors.response.use(
           errorMsg = error.response.data.message !== undefined ? error.response.data.message : error.response.statusText
         }
       } else {
-        errorMsg = '请求失败，请检查服务状态'
+        errorMsg = '请求失败，请检查服务状态！'
       }
       if (code === 401) {
-        Notification.warning({
-          title: '提示',
+        Message.warning({
           message: '授权已过期，正在尝试重新授权....',
-          duration: 5000
+          duration: 5000,
+          center: true,
+          showClose: true
         })
       } else {
-        Notification.error({
+        Message.error({
           message: errorMsg,
-          duration: 5000
+          duration: 5000,
+          center: true,
+          showClose: true
         })
       }
     }

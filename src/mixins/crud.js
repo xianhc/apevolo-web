@@ -111,39 +111,44 @@ export default {
     /**
      * 通用的提示封装
      */
-    submitSuccessNotify() {
-      this.$notify({
-        title: '提交成功',
+    submitSuccessMessage() {
+      this.$message({
+        message: '提交成功',
         type: 'success',
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
-    addSuccessNotify() {
-      this.$notify({
-        title: '新增成功',
+    addSuccessMessage() {
+      this.$message({
+        message: '新增成功',
         type: 'success',
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
-    editSuccessNotify() {
-      this.$notify({
-        title: '编辑成功',
+    editSuccessMessage() {
+      this.$message({
+        message: '编辑成功',
         type: 'success',
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
-    delSuccessNotify() {
-      this.$notify({
-        title: '删除成功',
+    delSuccessMessage() {
+      this.$message({
+        message: '删除成功',
         type: 'success',
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
-    notify(title, type) {
-      this.$notify({
-        title: title,
+    Message(message, type) {
+      this.$message({
+        message,
         type: type,
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
     /**
@@ -164,7 +169,7 @@ export default {
         this.delLoading = false
         this.$refs[id].doClose()
         this.dleChangePage()
-        this.delSuccessNotify()
+        this.delSuccessMessage()
         this.afterDelMethod()
         this.init()
       }).catch(() => {
@@ -199,10 +204,11 @@ export default {
         this.delAllLoading = false
         this.dleChangePage(ids.length)
         this.init()
-        this.$notify({
-          title: '删除成功',
+        this.$message({
+          message: '删除成功',
           type: 'success',
-          duration: 2500
+          duration: 2500,
+          center: true
         })
       }).catch(() => {
         this.delAllLoading = false
@@ -242,7 +248,7 @@ export default {
      */
     addMethod() {
       this.crudMethod.add(this.form).then(() => {
-        this.addSuccessNotify()
+        this.addSuccessMessage()
         this.loading = false
         this.afterAddMethod()
         this.cancel()
@@ -265,7 +271,7 @@ export default {
      */
     editMethod() {
       this.crudMethod.edit(this.form).then(() => {
-        this.editSuccessNotify()
+        this.editSuccessMessage()
         this.loading = false
         this.afterEditMethod()
         this.cancel()

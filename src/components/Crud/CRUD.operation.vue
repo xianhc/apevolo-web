@@ -223,7 +223,7 @@ export default {
         selectedCount += column.visible ? 1 : 0
       })
       if (selectedCount === 0) {
-        this.crud.notify('请至少选择一列', CRUD.NOTIFICATION_TYPE.WARNING)
+        this.crud.message('请至少选择一列', CRUD.NOTIFICATION_TYPE.WARNING)
         this.$nextTick(function() {
           item.visible = true
         })

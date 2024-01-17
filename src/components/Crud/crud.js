@@ -106,17 +106,17 @@ function CRUD(options) {
     /**
      * 通用的提示
      */
-    submitSuccessNotify() {
-      crud.notify(crud.msg.submit, CRUD.NOTIFICATION_TYPE.SUCCESS)
+    submitSuccessMessage() {
+      crud.message(crud.msg.submit, CRUD.NOTIFICATION_TYPE.SUCCESS)
     },
-    addSuccessNotify() {
-      crud.notify(crud.msg.add, CRUD.NOTIFICATION_TYPE.SUCCESS)
+    addSuccessMessage() {
+      crud.message(crud.msg.add, CRUD.NOTIFICATION_TYPE.SUCCESS)
     },
-    editSuccessNotify() {
-      crud.notify(crud.msg.edit, CRUD.NOTIFICATION_TYPE.SUCCESS)
+    editSuccessMessage() {
+      crud.message(crud.msg.edit, CRUD.NOTIFICATION_TYPE.SUCCESS)
     },
-    delSuccessNotify() {
-      crud.notify(crud.msg.del, CRUD.NOTIFICATION_TYPE.SUCCESS)
+    delSuccessMessage() {
+      crud.message(crud.msg.del, CRUD.NOTIFICATION_TYPE.SUCCESS)
     },
     // 搜索
     toQuery() {
@@ -259,7 +259,7 @@ function CRUD(options) {
       crud.crudMethod.add(crud.form).then(() => {
         crud.status.add = CRUD.STATUS.NORMAL
         crud.resetForm()
-        crud.addSuccessNotify()
+        crud.addSuccessMessage()
         callVmHook(crud, CRUD.HOOK.afterSubmit)
         crud.toQuery()
       }).catch(() => {
@@ -278,7 +278,7 @@ function CRUD(options) {
       crud.crudMethod.edit(crud.form).then(() => {
         crud.status.edit = CRUD.STATUS.NORMAL
         crud.getDataStatus(crud.getDataId(crud.form)).edit = CRUD.STATUS.NORMAL
-        crud.editSuccessNotify()
+        crud.editSuccessMessage()
         crud.resetForm()
         callVmHook(crud, CRUD.HOOK.afterSubmit)
         crud.refresh()
@@ -315,7 +315,7 @@ function CRUD(options) {
           crud.delAllLoading = false
         } else dataStatus.delete = CRUD.STATUS.PREPARED
         crud.dleChangePage(1)
-        crud.delSuccessNotify()
+        crud.delSuccessMessage()
         callVmHook(crud, CRUD.HOOK.afterDelete, data)
         crud.refresh()
       }).catch(() => {
@@ -490,11 +490,12 @@ function CRUD(options) {
     findVM(type) {
       return crud.vms.find(vm => vm && vm.type === type).vm
     },
-    notify(title, type = CRUD.NOTIFICATION_TYPE.INFO) {
-      crud.vms[0].vm.$notify({
-        title,
+    message(message, type = CRUD.NOTIFICATION_TYPE.INFO) {
+      crud.vms[0].vm.$message({
+        message,
         type,
-        duration: 2500
+        duration: 2500,
+        center: true
       })
     },
     updateProp(name, value) {

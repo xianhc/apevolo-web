@@ -388,7 +388,7 @@ export default {
       crudJob
         .execution(id)
         .then((res) => {
-          this.crud.notify('执行成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.crud.message('执行成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
           this.crud.toQuery()
         })
         .catch((err) => {
@@ -400,7 +400,7 @@ export default {
       crudJob
         .pause(id)
         .then((res) => {
-          this.crud.notify('暂停成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.crud.message('暂停成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
           this.crud.toQuery()
         })
         .catch((err) => {
@@ -412,7 +412,7 @@ export default {
       crudJob
         .resume(id)
         .then((res) => {
-          this.crud.notify('恢复成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.crud.message('恢复成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
           this.crud.toQuery()
         })
         .catch((err) => {
@@ -427,7 +427,7 @@ export default {
           this.delLoading = false
           this.$refs[id].doClose()
           this.crud.dleChangePage(1)
-          this.crud.delSuccessNotify()
+          this.crud.delSuccessMessage()
           this.crud.toQuery()
         })
         .catch(() => {
