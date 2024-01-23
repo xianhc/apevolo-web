@@ -5,7 +5,7 @@
   "author": "Ape Volo",
   "license": "Apache-2.0",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "node openDocument.js && vue-cli-service serve --open",
     "build:prod": "vue-cli-service build",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xianhc/apevolo-api.git" 
+    "url": "https://github.com/xianhc/apevolo-api.git"
   },
   "bugs": {
     "url": "https://github.com/xianhc/apevolo-api/issues"
