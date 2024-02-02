@@ -12,62 +12,58 @@
       style="width: 100%"
       @selection-change="crud.selectionChangeHandler"
     >
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="请求参数">
-              <span>{{ props.row.requestParameters }}</span>
-            </el-form-item>
-          </el-form>
+      <el-table-column prop="createBy" label="用户名" />
+      <el-table-column prop="createTime" label="创建日期" width="180px" />
+      <el-table-column label="异常详情" width="80px">
+        <template #default="scope">
+          <div>
+            <el-popover v-if="scope.row.exceptionMessageFull" placement="left-start" trigger="click">
+              <div class="popover-box">
+                <pre>{{ errFullInfo(scope.row.requestUrl,scope.row.requestParameters,scope.row.exceptionMessageFull,scope.row.exceptionStack) }}</pre>
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+            <span v-else>无</span>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="createBy" label="用户名" />
+      <el-table-column prop="requestUrl" label="请求路径" />
+      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="method" label="请求方法" />
+      <el-table-column prop="requestParameters" label="请求参数" width="80px">
+        <template #default="scope">
+          <div>
+            <el-popover v-if="scope.row.requestParameters && scope.row.requestParameters.trim() !== '{}'" placement="left-start" trigger="click">
+              <div class="popover-box">
+                <pre>{{ convertToJson(scope.row.requestParameters) }}</pre>
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+            <span v-else>{}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="requestIp" label="IP" />
       <el-table-column
         :show-overflow-tooltip="true"
         prop="ipAddress"
         label="IP来源"
       />
-      <el-table-column prop="description" label="描述" />
       <el-table-column prop="operatingSystem" label="操作系统" />
       <el-table-column prop="deviceType" label="设备类型" />
       <el-table-column prop="browserName" label="浏览器" />
       <el-table-column prop="version" label="版本号" />
-      <el-table-column prop="area" label="区域" />
-      <el-table-column prop="controller" label="控制器" />
-      <el-table-column prop="action" label="方法名称" />
-      <el-table-column prop="method" label="请求类型" />
-      <el-table-column prop="createTime" label="创建日期" width="180px">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="异常详情" width="100px">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            @click="info(scope.row.id)"
-          >查看详情</el-button>
-        </template>
-      </el-table-column>
     </el-table>
-    <el-dialog
-      :visible.sync="dialog"
-      title="异常详情"
-      append-to-body
-      top="30px"
-      width="85%"
-    >
-      <pre v-highlightjs="errorInfo"><code class="java" /></pre>
-    </el-dialog>
     <!--分页组件-->
     <pagination />
   </div>
 </template>
 
 <script>
-import { getErrDetail } from '@/api/monitor/log'
 import Search from './search'
 import CRUD, { presenter } from '@crud/crud'
 import crudOperation from '@crud/CRUD.operation'
@@ -95,39 +91,34 @@ export default {
     }
   },
   methods: {
-    // 获取异常详情
-    info(id) {
-      this.dialog = true
-      getErrDetail(id).then((res) => {
-        this.errorInfo = res.exceptionInfoFull
-      })
+    convertToJson(value) {
+      try {
+        return JSON.parse(value)
+      } catch (err) {
+        return value
+      }
+    },
+    errFullInfo(url, para, msg, stack) {
+      try {
+        return url + '\n\r' + para + '\n\r' + msg + '\n\r' + stack
+      } catch (err) {
+        return ''
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.demo-table-expand {
-  font-size: 0;
+.popover-box {
+  background: #112435;
+  color: #f08047;
+  height: auto;
+  width: 900px;
+  overflow: auto;
+  scrollbar-width: thin;
 }
-.demo-table-expand label {
-  width: 70px;
-  color: #99a9bf;
-}
-.demo-table-expand .el-form-item {
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 100%;
-}
-.demo-table-expand .el-form-item__content {
-  font-size: 12px;
-}
-/deep/ .el-dialog__body {
-  padding: 0 20px 10px 20px !important;
-}
-.java.hljs {
-  color: #444;
-  background: #ffffff !important;
-  height: 630px !important;
+.popover-box::-webkit-scrollbar {
+  display: none;
 }
 </style>

@@ -12,23 +12,12 @@
       style="width: 100%"
       @selection-change="crud.selectionChangeHandler"
     >
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="请求参数">
-              <span>{{ props.row.requestParameters }}</span>
-            </el-form-item>
-          </el-form>
+      <el-table-column prop="createBy" label="用户名" />
+      <el-table-column prop="createTime" label="创建日期" width="180px">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createBy" label="用户名" />
-      <el-table-column prop="requestIp" label="IP" />
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="ipAddress"
-        label="IP来源"
-      />
-      <el-table-column prop="description" label="描述" />
       <el-table-column prop="executionDuration" label="请求耗时" align="center">
         <template slot-scope="scope">
           <el-tag
@@ -48,19 +37,49 @@
           >{{ scope.row.executionDuration }}ms</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="requestUrl" label="请求路径" />
+      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="method" label="请求方法" />
+      <el-table-column prop="responseData" label="请求参数" width="80px;">
+        <template #default="scope">
+          <div>
+            <el-popover v-if="scope.row.requestParameters && scope.row.requestParameters.trim() !== '{}'" placement="left-start" trigger="click">
+              <div class="popover-box">
+                <pre>{{ convertToJson(scope.row.requestParameters) }}</pre>
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+            <span v-else>{}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="responseData" label="响应" width="80px;">
+        <template #default="scope">
+          <div>
+            <el-popover v-if="scope.row.responseData && scope.row.responseData.trim() !== '{}'" placement="left-start" trigger="click">
+              <div class="popover-box">
+                <pre>{{ convertToJson(scope.row.responseData) }}</pre>
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+            <span v-else>{}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="requestIp" label="IP" />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="ipAddress"
+        label="IP来源"
+      />
       <el-table-column prop="operatingSystem" label="操作系统" />
       <el-table-column prop="deviceType" label="设备类型" />
       <el-table-column prop="browserName" label="浏览器" />
       <el-table-column prop="version" label="版本号" />
-      <el-table-column prop="area" label="区域" />
-      <el-table-column prop="controller" label="控制器" />
-      <el-table-column prop="action" label="方法名称" />
-      <el-table-column prop="method" label="请求类型" />
-      <el-table-column prop="createTime" label="创建日期" width="180px">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
     </el-table>
     <!--分页组件-->
     <pagination />
@@ -88,24 +107,29 @@ export default {
       download: false
     }
   },
-  methods: {}
+  methods: {
+    convertToJson(value) {
+      try {
+        return JSON.parse(value)
+      } catch (err) {
+        return value
+      }
+    }
+  }
 }
 </script>
 
 <style>
-.demo-table-expand {
-  font-size: 0;
+.popover-box {
+  background: #112435;
+  color: #f08047;
+  height: 600px;
+  width: 500px;
+  overflow: auto;
+  scrollbar-width: thin;
+
 }
-.demo-table-expand label {
-  width: 70px;
-  color: #99a9bf;
-}
-.demo-table-expand .el-form-item {
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 100%;
-}
-.demo-table-expand .el-form-item__content {
-  font-size: 12px;
+.popover-box::-webkit-scrollbar {
+  display: none;
 }
 </style>

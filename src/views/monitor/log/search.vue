@@ -1,7 +1,7 @@
 <template>
   <div v-if="crud.props.searchToggle">
     <el-input
-      v-model="query.blurry"
+      v-model="query.keyWords"
       clearable
       size="small"
       placeholder="请输入你要搜索的内容"
