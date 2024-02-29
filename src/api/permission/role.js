@@ -18,7 +18,7 @@ export function add(data) {
 
 export function get(id) {
   return request({
-    url: 'api/role/' + id,
+    url: 'api/role/querySingle?id=' + id,
     method: 'get'
   })
 }
@@ -46,12 +46,33 @@ export function edit(data) {
   })
 }
 
+export function getMenusTree() {
+  return request({
+    url: 'api/permissions/menus/query',
+    method: 'get'
+  })
+}
+export function getApisTree() {
+  return request({
+    url: 'api/permissions/apis/query',
+    method: 'get'
+  })
+}
+
 export function editMenu(data) {
   return request({
-    url: 'api/role/menu/edit',
+    url: 'api/permissions/menus/edit',
     method: 'put',
     data
   })
 }
 
-export default { add, edit, del, get, editMenu, getLevel }
+export function editApi(data) {
+  return request({
+    url: 'api/permissions/apis/edit',
+    method: 'put',
+    data
+  })
+}
+
+export default { add, edit, del, get, editMenu, editApi, getLevel, getMenusTree, getApisTree }

@@ -25,32 +25,25 @@ export function edit(data) {
   })
 }
 
-export function updateIsPause(id) {
-  return request({
-    url: 'api/tasks/' + id,
-    method: 'put'
-  })
-}
-
 export function execution(id) {
   return request({
-    url: 'api/tasks/execute/' + id,
+    url: 'api/tasks/execute?id=' + id,
     method: 'put'
   })
 }
 
 export function pause(id) {
   return request({
-    url: 'api/tasks/pause/' + id,
+    url: 'api/tasks/pause?id=' + id,
     method: 'put'
   })
 }
 
 export function resume(id) {
   return request({
-    url: 'api/tasks/resume/' + id,
+    url: 'api/tasks/resume?id=' + id,
     method: 'put'
   })
 }
 
-export default { del, updateIsPause, execution, add, edit, pause, resume }
+export default { del, execution, add, edit, pause, resume }

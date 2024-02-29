@@ -39,6 +39,7 @@ export function buildMenus() {
 }
 
 export function add(data) {
+  data.type = Number(data.type)
   return request({
     url: 'api/menu/create',
     method: 'post',

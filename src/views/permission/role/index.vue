@@ -104,7 +104,6 @@
         :md="16"
         :lg="16"
         :xl="17"
-        style="margin-bottom: 10px"
       >
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
@@ -140,7 +139,7 @@
               label="创建日期"
             />
             <el-table-column
-              v-if="checkPer(['roles_edit', 'roles_del'])"
+              v-if="checkPer(['role_edit', 'roles_del'])"
               label="操作"
               width="130px"
               align="center"
@@ -161,41 +160,71 @@
       </el-col>
       <!-- 菜单授权 -->
       <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="7">
-        <el-card class="box-card" shadow="never">
-          <div slot="header" class="clearfix">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="选择指定角色分配菜单"
-              placement="top"
-            >
-              <span class="role-span">菜单分配</span>
-            </el-tooltip>
-            <el-button
-              v-permission="['roles_edit']"
-              :disabled="!showButton"
-              :loading="menuLoading"
-              icon="el-icon-check"
-              size="mini"
-              style="float: right; padding: 6px 9px"
-              type="primary"
-              @click="saveMenu"
-            >保存</el-button>
-          </div>
-          <el-tree
-            ref="menu"
-            lazy
-            :data="menus"
-            :default-checked-keys="menuIds"
-            :load="getMenuDatas"
-            :props="defaultProps"
-            check-strictly
-            accordion
-            show-checkbox
-            node-key="id"
-            @check="menuChange"
-          />
-        </el-card>
+        <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+          <el-tab-pane label="菜单管理" name="first">
+            <el-card class="box-card" shadow="never">
+              <div slot="header" class="clearfix">
+                <el-input
+                  v-model="filterMenuText"
+                  style="float: left;width: 80%;"
+                  placeholder="输入关键字进行过滤"
+                />
+                <el-button
+                  v-permission="['role_edit']"
+                  :disabled="!showButton"
+                  :loading="menuLoading"
+                  icon="el-icon-check"
+                  size="small"
+                  style="float: right;"
+                  type="primary"
+                  @click="saveMenu"
+                >保存</el-button>
+              </div>
+              <el-tree
+                ref="menu"
+                :data="menus"
+                :default-checked-keys="menuIds"
+                :props="defaultProps"
+                show-checkbox
+                node-key="id"
+                default-expand-all
+                check-strictly
+                :filter-node-method="filterMenuNode"
+              />
+            </el-card>
+          </el-tab-pane>
+          <el-tab-pane label="Api管理" name="second">
+            <el-card class="box-card" shadow="never">
+              <div slot="header" class="clearfix">
+                <el-input
+                  v-model="filterApiText"
+                  style="float: left;width: 80%;"
+                  placeholder="输入关键字进行过滤"
+                />
+                <el-button
+                  v-permission="['role_edit']"
+                  :disabled="!showButton"
+                  :loading="menuLoading"
+                  icon="el-icon-check"
+                  size="small"
+                  style="float: right;"
+                  type="primary"
+                  @click="saveApi"
+                >保存</el-button>
+              </div>
+              <el-tree
+                ref="api"
+                :data="apis"
+                :default-checked-keys="apisIds"
+                :props="defaultProps"
+                show-checkbox
+                node-key="id"
+                default-expand-all
+                :filter-node-method="filterApiNode"
+              />
+            </el-card>
+          </el-tab-pane>
+        </el-tabs>
       </el-col>
     </el-row>
   </div>
@@ -204,7 +233,6 @@
 <script>
 import crudRoles from '@/api/permission/role'
 import { getDepts, getDeptSuperior } from '@/api/permission/dept'
-import { getMenusTree, getChild } from '@/api/permission/menu'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -244,6 +272,8 @@ export default {
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
     return {
+      filterMenuText: '',
+      filterApiText: '',
       defaultProps: { children: 'children', label: 'label', isLeaf: 'leaf' },
       dateScopes: ['全部', '本级', '自定义'],
       level: 3,
@@ -251,13 +281,15 @@ export default {
       menuLoading: false,
       showButton: false,
       menus: [],
+      apis: [],
       menuIds: [],
+      apisIds: [],
       depts: [],
       deptDatas: [], // 多选时使用
       permission: {
-        add: ['roles_add'],
-        edit: ['roles_edit'],
-        del: ['roles_del'],
+        add: ['role_add'],
+        edit: ['role_edit'],
+        del: ['role_del'],
         down: ['role_down']
       },
       rules: {
@@ -265,21 +297,44 @@ export default {
         permission: [
           { required: true, message: '请输入权限', trigger: 'blur' }
         ]
-      }
+      },
+      activeName: 'first'
+    }
+  },
+  watch: {
+    filterMenuText(val) {
+      this.$refs.menu.filter(val)
+    },
+    filterApiText(val) {
+      this.$refs.api.filter(val)
     }
   },
   created() {
     crudRoles.getLevel().then((data) => {
       this.level = data.level
     })
+    crudRoles.getMenusTree().then((data) => {
+      this.menus = data
+    })
+    crudRoles.getApisTree().then((data) => {
+      this.apis = data
+    })
   },
   methods: {
-    getMenuDatas(node, resolve) {
-      setTimeout(() => {
-        getMenusTree(node.data.id ? node.data.id : 0).then((res) => {
-          resolve(res)
-        })
-      }, 100)
+    // getMenuDatas(node, resolve) {
+    //  setTimeout(() => {
+    //    getMenusTree(node.data.id ? node.data.id : 0).then((res) => {
+    //      resolve(res)
+    //    })
+    //  }, 100)
+    // },
+    filterMenuNode(value, data) {
+      if (!value) return true
+      return data.label.indexOf(value) !== -1
+    },
+    filterApiNode(value, data) {
+      if (!value) return true
+      return data.label.indexOf(value) !== -1
     },
     [CRUD.HOOK.afterRefresh]() {
       this.$refs.menu.setCheckedKeys([])
@@ -326,6 +381,7 @@ export default {
         const _this = this
         // 清空菜单的选中
         this.$refs.menu.setCheckedKeys([])
+        this.$refs.api.setCheckedKeys([])
         // 保存当前的角色id
         this.currentId = val.id
         // 初始化默认选中的key
@@ -333,33 +389,16 @@ export default {
         val.menus.forEach(function(data) {
           _this.menuIds.push(data.id)
         })
+        this.apisIds = []
+        val.apis.forEach(function(data) {
+          _this.apisIds.push(data.id)
+        })
         this.showButton = true
       }
     },
-    menuChange(menu) {
-      // 获取该节点的所有子节点，id 包含自身
-      getChild(menu.id).then((childIds) => {
-        // 判断是否在 menuIds 中，如果存在则删除，否则添加
-        if (this.menuIds.indexOf(menu.id) !== -1) {
-          for (let i = 0; i < childIds.length; i++) {
-            const index = this.menuIds.indexOf(childIds[i])
-            if (index !== -1) {
-              this.menuIds.splice(index, 1)
-            }
-          }
-        } else {
-          for (let i = 0; i < childIds.length; i++) {
-            const index = this.menuIds.indexOf(childIds[i])
-            if (index === -1) {
-              this.menuIds.push(childIds[i])
-            }
-          }
-        }
-        this.$refs.menu.setCheckedKeys(this.menuIds)
-      })
-    },
     // 保存菜单
     saveMenu() {
+      this.menuIds = this.$refs.menu.getCheckedKeys()
       this.menuLoading = true
       const role = { id: this.currentId, menus: [] }
       // 得到已选中的 key 值
@@ -370,7 +409,31 @@ export default {
       crudRoles
         .editMenu(role)
         .then(() => {
-          this.crud.message('保存成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.menuIds = []
+          this.crud.message('保存菜单成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+          this.menuLoading = false
+          this.update()
+        })
+        .catch((err) => {
+          this.menuLoading = false
+          console.log(err.response.data.message)
+        })
+    },
+    // 保存Api
+    saveApi() {
+      this.apisIds = this.$refs.api.getCheckedKeys()
+      this.menuLoading = true
+      const role = { id: this.currentId, apis: [] }
+      // 得到已选中的 key 值
+      this.apisIds.forEach(function(id) {
+        const api = { id: id }
+        role.apis.push(api)
+      })
+      crudRoles
+        .editApi(role)
+        .then(() => {
+          this.apisIds = []
+          this.crud.message('保存Api成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
           this.menuLoading = false
           this.update()
         })
@@ -381,7 +444,6 @@ export default {
     },
     // 改变数据
     update() {
-      // 无刷新更新 表格数据
       crudRoles.get(this.currentId).then((res) => {
         for (let i = 0; i < this.crud.data.length; i++) {
           if (res.id === this.crud.data[i].id) {
@@ -447,6 +509,9 @@ export default {
     },
     checkboxT(row) {
       return row.level >= this.level
+    },
+    handleClick(tab, event) {
+      console.log(tab, event)
     }
   }
 }

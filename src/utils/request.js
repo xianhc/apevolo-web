@@ -70,12 +70,6 @@ service.interceptors.response.use(
           if (token !== null && refreshTokenExpires !== null && curTime < refreshTokenExpiresTime) {
             refreshToken(token).then(res => {
               if (res && res.hasOwnProperty('access_token')) {
-                Message.success({
-                  message: '重新授权完成，登录成功....',
-                  duration: 5000,
-                  center: true,
-                  showClose: true
-                })
                 setToken(res)
                 error.config.__isRetryRequest = true
                 error.config.headers['Authorization'] = getTokenType() + ' ' + res.access_token
@@ -95,12 +89,6 @@ service.interceptors.response.use(
             })
           } else {
             window.localStorage.clear()
-            Message.warning({
-              message: '授权已过期，请重新登录！',
-              duration: 5000,
-              center: true,
-              showClose: true
-            })
             store.dispatch('LogOut').then(() => {
               location.reload()
             })
@@ -119,14 +107,7 @@ service.interceptors.response.use(
       } else {
         errorMsg = '请求失败，请检查服务状态！'
       }
-      if (code === 401) {
-        Message.warning({
-          message: '授权已过期，正在尝试重新授权....',
-          duration: 5000,
-          center: true,
-          showClose: true
-        })
-      } else {
+      if (code !== 401) {
         Message.error({
           message: errorMsg,
           duration: 5000,

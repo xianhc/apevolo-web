@@ -184,20 +184,6 @@
             placeholder="组件路径"
           />
         </el-form-item>
-        <el-form-item
-          v-show="
-            form.iframe.toString() !== 'true' && form.type.toString() !== '1'
-          "
-          label="后台URL"
-          prop="linkUrl"
-        >
-          <el-input
-            v-model="form.linkUrl"
-            :style="'width: 450px'
-            "
-            placeholder="服务端URL路径"
-          />
-        </el-form-item>
         <el-form-item label="上级类目" prop="parentId">
           <treeselect
             v-model="form.parentId"
@@ -324,8 +310,7 @@ const defaultForm = {
   cache: false,
   hidden: false,
   type: 1,
-  permission: null,
-  linkUrl: null
+  permission: null
 }
 export default {
   name: 'Menu',
@@ -357,7 +342,6 @@ export default {
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         path: [{ required: true, message: '请输入地址', trigger: 'blur' }]
-        // linkUrl: [{ required: true, message: '请输入服务端URL', trigger: 'blur' }]
       }
     }
   },

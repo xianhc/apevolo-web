@@ -77,13 +77,18 @@
         label="执行参数"
       />
       <el-table-column prop="createTime" label="异常详情" width="110px">
-        <template slot-scope="scope">
-          <el-button
-            v-show="scope.row.exceptionDetail"
-            size="mini"
-            type="text"
-            @click="info(scope.row.exceptionDetail)"
-          >查看详情</el-button>
+        <template #default="scope">
+          <div>
+            <el-popover v-if="scope.row.exceptionDetail" placement="left-start" trigger="click">
+              <div class="popover-box">
+                <pre>{{ scope.row.exceptionDetail }}</pre>
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+            <span v-else>无</span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -111,14 +116,6 @@
         label="执行时间"
       />
     </el-table>
-    <el-dialog
-      :visible.sync="errorDialog"
-      append-to-body
-      title="异常详情"
-      width="75%"
-    >
-      <pre v-highlightjs="errorInfo"><code class="java" /></pre>
-    </el-dialog>
     <!--分页组件-->
     <el-pagination
       :total="totalElements"
@@ -141,8 +138,6 @@ export default {
     return {
       id: '',
       title: '作业日志',
-      errorInfo: '',
-      errorDialog: false,
       enabledTypeOptions: [
         { key: 'true', display_name: '成功' },
         { key: 'false', display_name: '失败' }
@@ -158,24 +153,25 @@ export default {
     },
     // 获取数据前设置好接口地址
     beforeInit() {
-      this.url = 'api/tasks/logs/query/' + this.id
+      this.query.id = this.id
+      this.url = 'api/tasks/logs/query'
       return true
-    },
-    // 异常详情
-    info: function(errorInfo) {
-      this.errorInfo = errorInfo
-      this.errorDialog = true
     }
   }
 }
 </script>
 
 <style scoped>
-.java.hljs {
-  color: #444;
-  background: #ffffff !important;
+.popover-box {
+  background: #112435;
+  color: #f08047;
+  height: 600px;
+  width: 800px;
+  overflow: auto;
+  scrollbar-width: thin;
+
 }
-::v-deep .el-dialog__body {
-  padding: 0 20px 10px 20px !important;
+.popover-box::-webkit-scrollbar {
+  display: none;
 }
 </style>
