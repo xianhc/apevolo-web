@@ -395,6 +395,10 @@ export default {
     // 选中图标
     selected(name) {
       this.form.icon = name
+    },
+    [CRUD.HOOK.afterValidateCU](crud) {
+      crud.form.type = Number(crud.form.type)
+      return true
     }
   }
 }

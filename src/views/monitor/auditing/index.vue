@@ -104,7 +104,7 @@ export default {
       add: false,
       edit: false,
       del: false,
-      download: false
+      down: false
     }
   },
   methods: {

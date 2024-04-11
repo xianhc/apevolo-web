@@ -76,18 +76,12 @@ export default {
     return CRUD({ title: '异常日志', url: 'api/exception/query' })
   },
   mixins: [presenter()],
-  data() {
-    return {
-      errorInfo: '',
-      dialog: false
-    }
-  },
   created() {
     this.crud.optShow = {
       add: false,
       edit: false,
       del: false,
-      download: false
+      down: false
     }
   },
   methods: {

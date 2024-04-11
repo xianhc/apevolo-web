@@ -79,7 +79,7 @@ export default {
         add: ['apis_add'],
         edit: ['apis_edit'],
         del: ['apis_del'],
-        down: ['apis_down']
+        down: false
       },
       refreshLoading: false
     }

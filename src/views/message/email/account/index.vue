@@ -235,6 +235,10 @@ export default {
   methods: {
     checkboxT(row, rowIndex) {
       return row.id !== 1
+    },
+    [CRUD.HOOK.afterValidateCU](crud) {
+      crud.form.port = Number(crud.form.port)
+      return true
     }
   }
 }

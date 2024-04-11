@@ -50,14 +50,19 @@
         prop="subject"
         label="标题"
       />
-      <el-table-column prop="body" label="发送内容" width="110px">
-        <template slot-scope="scope">
-          <el-button
-            v-show="scope.row.body"
-            size="mini"
-            type="text"
-            @click="info(scope.row.body)"
-          >查看详情</el-button>
+      <el-table-column prop="responseData" label="发送内容" width="80px;">
+        <template #default="scope">
+          <div>
+            <el-popover placement="left-start" trigger="click">
+              <div class="popover-box">
+                <!--                <pre>{{ scope.row.body }}</pre>-->
+                <pre v-html="scope.row.body" />
+              </div>
+              <template #reference>
+                <i class="el-icon-view" style="cursor: pointer;font-size: 20px;" />
+              </template>
+            </el-popover>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -94,14 +99,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog
-      :visible.sync="bodyDialog"
-      append-to-body
-      title="发送内容"
-      width="65%"
-    >
-      <pre v-highlightjs="sendBody"><code class="katex-html" /></pre>
-    </el-dialog>
     <!--分页组件-->
     <pagination />
     <!--Form表单--> <eForm />
@@ -135,7 +132,7 @@ export default {
         add: true,
         edit: true,
         del: true,
-        download: false,
+        down: false,
         reset: true
       }
     })
@@ -147,20 +144,27 @@ export default {
         add: ['queuedEmail_add'],
         edit: ['queuedEmail_edit'],
         del: ['queuedEmail_del']
-      },
-      sendBody: '',
-      bodyDialog: false
+      }
     }
   },
   methods: {
     checkboxT: function(row, rowIndex) {
       return row.id !== 1
-    },
-    // body
-    info(body) {
-      this.sendBody = body
-      this.bodyDialog = true
     }
   }
 }
 </script>
+<style>
+.popover-box {
+  //background: #112435;
+  //color: #f08047;
+  height: 700px;
+  width: 900px;
+  overflow: auto;
+  scrollbar-width: thin;
+
+}
+.popover-box::-webkit-scrollbar {
+  display: none;
+}
+</style>
