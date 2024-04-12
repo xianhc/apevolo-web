@@ -15,12 +15,6 @@
       size="small"
       label-width="100px"
     >
-      <el-form-item label="发件邮箱" prop="from">
-        <el-input v-model="form.from" style="width: 220px" />
-      </el-form-item>
-      <el-form-item label="发件人名称" prop="fromName">
-        <el-input v-model="form.fromName" style="width: 220px" />
-      </el-form-item>
       <el-form-item label="收件邮箱" prop="to">
         <el-input v-model="form.to" style="width: 220px" />
       </el-form-item>
@@ -84,11 +78,10 @@
 <script>
 import { form } from '@crud/crud'
 import { getAllEmailAccounts } from '@/api/message/emailAccount'
+import CRUD from '../../components/Crud/crud'
 
 const defaultForm = {
   id: null,
-  form: null,
-  formName: null,
   to: null,
   toName: null,
   priority: null,
@@ -106,10 +99,6 @@ export default {
     return {
       emailAccounts: [],
       rules: {
-        form: [
-          { required: true, message: '请输入发件邮箱', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
-        ],
         to: [
           { required: true, message: '请输入邮件邮箱', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
@@ -129,6 +118,10 @@ export default {
           this.emailAccounts = res.content
         })
         .catch(() => {})
+    },
+    [CRUD.HOOK.afterValidateCU](crud) {
+      crud.form.emailAccountId = Number(crud.form.emailAccountId)
+      return true
     }
   }
 }

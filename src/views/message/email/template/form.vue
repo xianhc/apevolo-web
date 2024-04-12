@@ -72,6 +72,7 @@
 <script>
 import { form } from '@crud/crud'
 import { getAllEmailAccounts } from '@/api/message/emailAccount'
+import CRUD from '../../../../components/Crud/crud'
 
 const defaultForm = {
   id: null,
@@ -116,6 +117,10 @@ export default {
           this.emailAccounts = res.content
         })
         .catch(() => {})
+    },
+    [CRUD.HOOK.afterValidateCU](crud) {
+      crud.form.emailAccountId = Number(crud.form.emailAccountId)
+      return true
     }
   }
 }
