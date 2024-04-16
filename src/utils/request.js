@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '../store'
-import { getRefreshTokenExpires, getToken, getTokenExpire, getTokenType, setToken } from '@/utils/auth'
-import { refreshToken } from '@/api/login'
+import { getRefreshTokenExpires, getToken, getTokenExpire, getTokenType } from '@/utils/auth'
 import Config from '@/settings'
 
 // 创建axios实例
@@ -10,6 +9,51 @@ const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? process.env.VUE_APP_BASE_API : '/', // api 的 base_url
   timeout: Config.timeout // 请求超时时间
 })
+
+let isRefreshing = false // 表示是否正在刷新token
+let failedQueue = [] // 存储失败的请求
+
+// 刷新token
+function refreshToken() {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      failedQueue.push({ resolve, reject })
+    }).then(token => {
+      return token
+    })
+  }
+
+  isRefreshing = true
+  return service.post('/auth/refreshToken', { token: getToken() })
+    .then((res) => {
+      window.localStorage.setItem('x-token', res.refresh_token)
+      window.localStorage.setItem('expires_in', res.expires_in)
+      const curTime = new Date()
+      window.localStorage.token_expire = new Date(curTime.setSeconds(curTime.getSeconds() + res.expires_in))
+      return res.refresh_token
+    }).catch(() => {
+      window.localStorage.clear()
+      store.dispatch('LogOut').then(() => {
+        location.reload()
+      })
+    }).finally(() => {
+      isRefreshing = false
+      // 成功刷新token后，重新发起所有失败的请求
+      const queue = [...failedQueue]
+      failedQueue = []
+      queue.forEach((request) => {
+        request.resolve(window.localStorage.getItem('x-token'))
+      })
+    })
+}
+
+// 当刷新token成功后，清空失败队列并重新发起请求
+// function retryFailedRequests(token) {
+//   failedQueue.forEach((request) => {
+//     request.resolve(token)
+//   })
+//   failedQueue = []
+// }
 
 // request拦截器
 service.interceptors.request.use(
@@ -62,31 +106,25 @@ service.interceptors.response.use(
         code = error.response.status
         if (code === 400) {
           errorMsg = error.response.data.message
-        } else if (code === 401) {
+        } else if (code === 401 && !error.config._retry) {
           const refreshTokenExpires = getRefreshTokenExpires()
           const token = getToken()
           const curTime = new Date()
           const refreshTokenExpiresTime = new Date(Date.parse(refreshTokenExpires))
           if (token !== null && refreshTokenExpires !== null && curTime < refreshTokenExpiresTime) {
-            refreshToken(token).then(res => {
-              if (res && res.hasOwnProperty('access_token')) {
-                setToken(res)
-                error.config.__isRetryRequest = true
-                error.config.headers['Authorization'] = getTokenType() + ' ' + res.access_token
-                return axios(error.config)
-              } else {
-                Message.warning({
-                  message: res.message,
-                  duration: 5000,
-                  center: true,
-                  showClose: true
-                })
-                window.localStorage.clear()
-                store.dispatch('LogOut').then(() => {
-                  location.reload()
-                })
-              }
-            })
+            if (!isRefreshing) {
+              return refreshToken().then((newToken) => {
+                error.config.headers.Authorization = getTokenType() + ` ${newToken}`
+                return service(error.config)
+              })
+            } else {
+              return new Promise((resolve, reject) => {
+                failedQueue.push({ resolve, reject })
+              }).then(newToken => {
+                error.config.headers.Authorization = getTokenType() + ` ${newToken}`
+                return service(error.config)
+              })
+            }
           } else {
             window.localStorage.clear()
             store.dispatch('LogOut').then(() => {
@@ -119,5 +157,4 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
 export default service
