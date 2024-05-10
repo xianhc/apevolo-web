@@ -9,11 +9,11 @@ export function add(data) {
 }
 
 export function del(ids) {
-  const data = ids.constructor === Array ? ids : Array.of(ids)
+  // const data = ids.constructor === Array ? ids : Array.of(ids)
   return request({
     url: '/api/tasks/delete',
     method: 'delete',
-    data: data
+    data: ids
   })
 }
 

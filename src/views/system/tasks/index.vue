@@ -48,19 +48,41 @@
         <el-form-item label="任务描述" prop="description">
           <el-input v-model="form.description" style="width: 220px" />
         </el-form-item>
-        <el-form-item label="执行类" prop="className">
-          <el-input v-model="form.className" style="width: 220px" />
-        </el-form-item>
-        <el-form-item label="Cron表达式" prop="cron">
-          <el-input v-model="form.cron" style="width: 220px" />
-        </el-form-item>
         <el-form-item label="任务负责人" prop="principal">
           <el-input v-model="form.principal" style="width: 220px" />
         </el-form-item>
-        <el-form-item label="告警邮箱" prop="alertEmail">
+        <el-form-item label="执行类" prop="className">
+          <el-input v-model="form.className" style="width: 220px" />
+        </el-form-item>
+        <el-form-item label="作业模式">
+          <el-radio-group v-model="form.triggerType" style="width: 220px" @change="handleRadioChange">
+            <el-radio
+              v-for="item in this.dict.task_trigger_type"
+              :key="item.id"
+              :label="item.value"
+            >
+              {{ item.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Cron表达式" prop="cron">
+          <el-input v-model="form.cron" :disabled="isCronDisabled" style="width: 220px" />
+        </el-form-item>
+        <el-form-item label="执行间隔(秒)" prop="intervalSecond">
           <el-input
-            v-model="form.alertEmail"
-            placeholder="多个邮箱用逗号隔开"
+            v-model="form.intervalSecond"
+            :disabled="isSimpleDisabled"
+            oninput="value=value.replace(/[^0-9]/g,'')"
+            placeholder="请输入作业执行间隔秒数"
+            style="width: 220px"
+          />
+        </el-form-item>
+        <el-form-item label="循环次数" prop="cycleRunTimes">
+          <el-input
+            v-model="form.cycleRunTimes"
+            :disabled="isSimpleDisabled"
+            oninput="value=value.replace(/[^0-9]/g,'')"
+            placeholder="请输入循环次数"
             style="width: 220px"
           />
         </el-form-item>
@@ -80,20 +102,6 @@
             placeholder="选择日期"
           />
         </el-form-item>
-        <el-form-item label="执行间隔(秒)" prop="intervalSecond">
-          <el-input
-            v-model="form.intervalSecond"
-            placeholder="非Cron表达式模式使用"
-            style="width: 220px"
-          />
-        </el-form-item>
-        <el-form-item label="循环次数" prop="cycleRunTimes">
-          <el-input
-            v-model="form.cycleRunTimes"
-            placeholder="非Cron表达式模式使用"
-            style="width: 220px"
-          />
-        </el-form-item>
         <el-form-item label="失败后暂停">
           <el-radio-group v-model="form.pauseAfterFailure" style="width: 220px">
             <el-radio :label="true">是</el-radio>
@@ -105,6 +113,13 @@
             <el-radio :label="true">启用</el-radio>
             <el-radio :label="false">停用</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="告警邮箱" prop="alertEmail">
+          <el-input
+            v-model="form.alertEmail"
+            placeholder="多个邮箱用逗号隔开"
+            style="width: 556px"
+          />
         </el-form-item>
         <el-form-item label="参数内容">
           <el-input
@@ -121,7 +136,8 @@
           :loading="crud.status.cu === 2"
           type="primary"
           @click="crud.submitCU"
-        >确认</el-button>
+        >确认
+        </el-button>
       </div>
     </el-dialog>
     <!--表格渲染-->
@@ -133,7 +149,7 @@
       @selection-change="crud.selectionChangeHandler"
     >
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
-      <el-table-column :show-overflow-tooltip="true" prop="id" label="任务ID" />
+      <!--<el-table-column :show-overflow-tooltip="true" prop="id" label="任务ID" />-->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="taskName"
@@ -162,16 +178,24 @@
       />
       <el-table-column
         :show-overflow-tooltip="true"
-        prop="triggerTypeStr"
+        prop="triggerType"
         label="触发器模式"
-      />
+      >
+        <template slot-scope="scope">
+          <el-tag type="success">
+            {{ getDictText(scope.row.triggerType) }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="cron"
         label="cron表达式"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
+        prop="intervalSecond"
+        label="执行间隔(秒)"
+      />
+      <el-table-column
         prop="runTimes"
         label="已执行次数"
       />
@@ -181,7 +205,6 @@
         label="执行参数"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="principal"
         label="任务负责人"
       />
@@ -191,7 +214,6 @@
         label="告警邮箱"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="isEnable"
         width="90px"
         label="DB状态"
@@ -199,41 +221,38 @@
         <template slot-scope="scope">
           <el-tag :type="scope.row.isEnable ? 'success' : 'warning'">{{
             scope.row.isEnable ? '启动' : '停用'
-          }}</el-tag>
+          }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="triggerStatus"
         width="90px"
         label="RAM状态"
       >
         <template slot-scope="scope">
           <el-tag
-            :type="scope.row.triggerStatus === '正常' ? 'success' : 'warning'"
-          >{{ scope.row.triggerStatus }}</el-tag>
+            :type="scope.row.triggerStatus === '运行中' ? 'success' : 'warning'"
+          >{{ scope.row.triggerStatus }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="createTime"
         width="136px"
         label="创建时间"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="updateTime"
         width="136px"
         label="更新时间"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="startTime"
         width="136px"
         label="开始时间"
       />
       <el-table-column
-        :show-overflow-tooltip="true"
         prop="endTime"
         width="136px"
         label="结束时间"
@@ -252,22 +271,26 @@
             style="margin-right: 3px"
             type="text"
             @click="crud.toEdit(scope.row)"
-          >编辑</el-button>
+          >编辑
+          </el-button>
           <el-button
+            v-show="scope.row.triggerStatus==='未执行'"
             v-permission="['timing_edit']"
             style="margin-left: -2px"
             type="text"
             size="mini"
             @click="execute(scope.row.id)"
-          >执行</el-button>
+          >执行
+          </el-button>
           <el-button
-            v-show="scope.row.triggerStatus==='正常' "
+            v-show="scope.row.triggerStatus==='运行中'"
             v-permission="['timing_edit']"
             style="margin-left: -2px"
             type="text"
             size="mini"
             @click="Pause(scope.row.id)"
-          >暂停</el-button>
+          >暂停
+          </el-button>
           <el-button
             v-show="scope.row.triggerStatus==='暂停' "
             v-permission="['timing_edit']"
@@ -275,26 +298,29 @@
             type="text"
             size="mini"
             @click="Resume(scope.row.id)"
-          >恢复</el-button>
+          >恢复
+          </el-button>
           <el-popover
             :ref="scope.row.id"
             v-permission="['timing_del']"
             placement="top"
             width="200"
           >
-            <p>确定停止并删除该任务吗？</p>
+            <p>确定删除该任务和作业吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button
                 size="mini"
                 type="text"
                 @click="$refs[scope.row.id].doClose()"
-              >取消</el-button>
+              >取消
+              </el-button>
               <el-button
                 :loading="delLoading"
                 type="primary"
                 size="mini"
                 @click="delMethod(scope.row.id)"
-              >确定</el-button>
+              >确定
+              </el-button>
             </div>
             <el-button slot="reference" type="text" size="mini">删除</el-button>
           </el-popover>
@@ -304,7 +330,8 @@
             type="text"
             size="mini"
             @click="doLog(scope.row.id)"
-          >日志</el-button>
+          >日志
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -334,11 +361,12 @@ const defaultForm = {
   alertEmail: null,
   startTime: null,
   endTime: null,
+  triggerType: '1',
   pauseAfterFailure: true,
   isEnable: false,
   runParams: null,
-  intervalSecond: 0,
-  cycleRunTimes: 0
+  intervalSecond: null,
+  cycleRunTimes: null
 }
 export default {
   name: 'Timing',
@@ -351,6 +379,7 @@ export default {
     })
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
+  dicts: ['task_trigger_type'],
   data() {
     return {
       delLoading: false,
@@ -380,6 +409,14 @@ export default {
           { required: true, message: '请输入负责人名称', trigger: 'blur' }
         ]
       }
+    }
+  },
+  computed: {
+    isCronDisabled() {
+      return this.form.triggerType === '0'
+    },
+    isSimpleDisabled() {
+      return this.form.triggerType === '1'
     }
   },
   methods: {
@@ -421,8 +458,9 @@ export default {
     },
     delMethod(id) {
       this.delLoading = true
+      const idCollection = { idArray: [id] }
       crudJob
-        .del([id])
+        .del(idCollection)
         .then(() => {
           this.delLoading = false
           this.$refs[id].doClose()
@@ -442,6 +480,58 @@ export default {
     },
     checkboxT(row, rowIndex) {
       return row.id !== 1
+    },
+    getDictText(value) {
+      try {
+        const dictList = this.dict.task_trigger_type
+        const keys = Object.keys(dictList)
+        const foundKey = keys.find(key => dictList[key].value === value.toString())
+        if (foundKey) {
+          return dictList[foundKey].label
+        }
+        return value
+      } catch (err) {
+        return value
+      }
+    },
+    handleRadioChange() {
+      if (this.form.triggerType === '1') {
+        this.form.intervalSecond = null
+        this.form.cycleRunTimes = null
+      } else if (this.form.triggerType === '0') {
+        this.form.cron = null
+      }
+    },
+    [CRUD.HOOK.afterValidateCU](crud) {
+      debugger
+      if (crud.form.triggerType === '1') {
+        if (crud.form.cron === null) {
+          this.$message({
+            message: 'cron模式下请设置作业执行cron表达式',
+            type: 'warning',
+            center: true
+          })
+          return false
+        }
+      } else if (crud.form.triggerType === '0') {
+        if (crud.form.intervalSecond === null || crud.form.intervalSecond <= 0) {
+          this.$message({
+            message: 'simple模式下请设置作业间隔执行秒数',
+            type: 'warning',
+            center: true
+          })
+          return false
+        }
+      }
+      if (crud.form.triggerType === '0') {
+        crud.form.intervalSecond = Number(crud.form.intervalSecond)
+      }
+      crud.form.triggerType = Number(crud.form.triggerType)
+      return true
+    },
+    // 新增与编辑前做的操作
+    [CRUD.HOOK.afterToCU](crud) {
+      crud.form.triggerType = crud.form.triggerType.toString()
     }
   }
 }
