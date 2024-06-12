@@ -503,7 +503,6 @@ export default {
       }
     },
     [CRUD.HOOK.afterValidateCU](crud) {
-      debugger
       if (crud.form.triggerType === '1') {
         if (crud.form.cron === null) {
           this.$message({

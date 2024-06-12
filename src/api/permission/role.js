@@ -1,9 +1,8 @@
 import request from '@/utils/request'
 
-// 获取所有的Role
-export function getAll() {
+export function getAllRole() {
   return request({
-    url: 'api/role/all',
+    url: 'api/role/queryAll',
     method: 'get'
   })
 }
@@ -52,6 +51,7 @@ export function getMenusTree() {
     method: 'get'
   })
 }
+
 export function getApisTree() {
   return request({
     url: 'api/permissions/apis/query',

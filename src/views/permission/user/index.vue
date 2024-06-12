@@ -49,10 +49,10 @@
               @change="crud.toQuery"
             >
               <el-option
-                v-for="item in enabledTypeOptions"
-                :key="item.key"
-                :label="item.display_name"
-                :value="item.key"
+                v-for="item in dict.user_stauas"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               />
             </el-select>
             <rrOperation />
@@ -130,7 +130,8 @@
                   v-for="item in dict.user_status"
                   :key="item.id"
                   :label="item.value === 'true'"
-                >{{ item.label }}</el-radio>
+                >{{ item.label }}
+                </el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item style="margin-bottom: 0" label="角色" prop="roles">
@@ -152,6 +153,21 @@
                 />
               </el-select>
             </el-form-item>
+            <el-form-item style="margin-bottom: 0" label="租户" prop="tenants">
+              <el-select
+                v-model="form.tenantId"
+                value-key="id"
+                style="width: 437px"
+                clearable
+              >
+                <el-option
+                  v-for="item in tenants"
+                  :key="item.tenantId"
+                  :label="item.name"
+                  :value="parseInt(item.tenantId)"
+                />
+              </el-select>
+            </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button type="text" @click="crud.cancelCU">取消</el-button>
@@ -159,7 +175,8 @@
               :loading="crud.status.cu === 2"
               type="primary"
               @click="crud.submitCU"
-            >确认</el-button>
+            >确认
+            </el-button>
           </div>
         </el-dialog>
         <!--表格渲染-->
@@ -251,8 +268,9 @@
 import crudUser from '@/api/permission/user'
 import { isvalidPhone } from '@/utils/validate'
 import { getDepts, getDeptSuperior } from '@/api/permission/dept'
-import { getAll, getLevel } from '@/api/permission/role'
+import { getAllRole, getLevel } from '@/api/permission/role'
 import { getAllJob } from '@/api/permission/job'
+import { getAllTenant } from '@/api/system/tenant'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -263,6 +281,7 @@ import Treeselect from '@riophae/vue-treeselect'
 import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+
 let userRoles = []
 let userJobs = []
 const defaultForm = {
@@ -275,7 +294,8 @@ const defaultForm = {
   roles: [],
   jobs: [],
   dept: { id: null },
-  phone: ''
+  phone: '',
+  tenantId: null
 }
 export default {
   name: 'User',
@@ -317,8 +337,9 @@ export default {
       jobs: [],
       level: 3,
       roles: [],
+      tenants: [],
       jobDatas: [],
-      roleDatas: [], // 多选时使用
+      roleDatas: [],
       defaultProps: { children: 'children', label: 'name', isLeaf: 'leaf' },
       permission: {
         add: ['user_add'],
@@ -326,10 +347,6 @@ export default {
         del: ['user_del'],
         down: ['user_down']
       },
-      enabledTypeOptions: [
-        { key: 'true', display_name: '激活' },
-        { key: 'false', display_name: '锁定' }
-      ],
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -401,6 +418,7 @@ export default {
       }
       this.getRoleLevel()
       this.getJobs()
+      this.getTenants()
       // form.enabled = form.enabled
     },
     // 新增前将多选的值设置为空
@@ -410,8 +428,6 @@ export default {
     },
     // 初始化编辑时候的角色与岗位
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      // this.getJobs(this.form.dept.id)
-      this.getJobs()
       this.jobDatas = []
       this.roleDatas = []
       userRoles = []
@@ -427,6 +443,9 @@ export default {
         const data = { id: job.id, name: job.name }
         userJobs.push(data)
       })
+      if (form.tenantId === 0) {
+        this.form.tenantId = null
+      }
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -534,10 +553,10 @@ export default {
     changeEnabled(data, val) {
       this.$confirm(
         '此操作将 "' +
-          this.dict.label.user_status[val] +
-          '" ' +
-          data.username +
-          ', 是否继续？',
+        this.dict.label.user_status[val] +
+        '" ' +
+        data.username +
+        ', 是否继续？',
         '提示',
         {
           confirmButtonText: '确定',
@@ -564,11 +583,12 @@ export default {
     },
     // 获取弹窗内角色数据
     getRoles() {
-      getAll()
+      getAllRole()
         .then((res) => {
           this.roles = res
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     },
     // 获取弹窗内岗位数据
     getJobs() {
@@ -576,7 +596,8 @@ export default {
         .then((res) => {
           this.jobs = res.content
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     },
     // 获取权限级别
     getRoleLevel() {
@@ -584,7 +605,16 @@ export default {
         .then((res) => {
           this.level = res.level
         })
-        .catch(() => {})
+        .catch(() => {
+        })
+    },
+    getTenants() {
+      getAllTenant()
+        .then((res) => {
+          this.tenants = res.content
+        })
+        .catch(() => {
+        })
     },
     checkboxT(row, rowIndex) {
       return row.id !== this.user.id
@@ -593,7 +623,7 @@ export default {
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style rel='stylesheet/scss' lang='scss' scoped>
 ::v-deep .vue-treeselect__control,
 ::v-deep .vue-treeselect__placeholder,
 ::v-deep .vue-treeselect__single-value {

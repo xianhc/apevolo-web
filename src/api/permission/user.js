@@ -27,7 +27,7 @@ export function edit(data) {
 
 export function editUser(data) {
   return request({
-    url: 'api/user/center',
+    url: 'api/user/update/center',
     method: 'put',
     data
   })

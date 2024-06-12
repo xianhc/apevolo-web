@@ -63,13 +63,15 @@
                 size="mini"
                 type="text"
                 @click="$refs[scope.$index].doClose()"
-              >取消</el-button>
+              >取消
+              </el-button>
               <el-button
                 :loading="delLoading"
                 type="primary"
                 size="mini"
                 @click="delMethod(scope.row.accessToken, scope.$index)"
-              >确定</el-button>
+              >确定
+              </el-button>
             </div>
             <el-button slot="reference" size="mini" type="text">强退</el-button>
           </el-popover>
@@ -122,7 +124,8 @@ export default {
         .then(() => {
           this.delMethod(datas)
         })
-        .catch(() => {})
+        .catch(() => {
+        })
     },
     // 强退用户
     delMethod(accessToken, index) {

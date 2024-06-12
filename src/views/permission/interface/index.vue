@@ -78,10 +78,18 @@ export default {
       permission: {
         add: ['apis_add'],
         edit: ['apis_edit'],
-        del: ['apis_del'],
-        down: false
+        del: ['apis_del']
       },
       refreshLoading: false
+    }
+  },
+  created() {
+    this.crud.optShow = {
+      add: true,
+      edit: true,
+      del: true,
+      reset: true,
+      down: false
     }
   },
   methods: {
