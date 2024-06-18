@@ -193,16 +193,23 @@
             width="55"
           />
           <el-table-column
+            width="80"
+            label="头像"
+          >
+            <img :src="user.avatarPath ? baseApi + user.avatarPath : Avatar" class="avatar" alt="用户头像">
+          </el-table-column>
+          <el-table-column
             :show-overflow-tooltip="true"
             prop="username"
+            width="135"
             label="用户名"
           />
           <el-table-column
             :show-overflow-tooltip="true"
             prop="nickName"
+            width="150"
             label="昵称"
           />
-          <el-table-column prop="gender" label="性别" />
           <el-table-column
             :show-overflow-tooltip="true"
             prop="phone"
@@ -217,11 +224,51 @@
           />
           <el-table-column
             :show-overflow-tooltip="true"
+            width="200"
+            label="角色"
+          >
+            <template slot-scope="scope">
+              <el-tag
+                v-for="role in scope.row.roles"
+                :key="role.id"
+                type="primary"
+                class="tag"
+              >
+                {{ role.name }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :show-overflow-tooltip="true"
             prop="dept"
             label="部门"
           >
             <template slot-scope="scope">
               <div>{{ scope.row.dept.name }}</div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :show-overflow-tooltip="true"
+            width="200"
+            label="岗位"
+          >
+            <template slot-scope="scope">
+              <el-tag
+                v-for="job in scope.row.jobs"
+                :key="job.id"
+                type="primary"
+                class="tag"
+              >
+                {{ job.name }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :show-overflow-tooltip="true"
+            label="租户"
+          >
+            <template slot-scope="scope">
+              <div v-if="scope.row.tenant">{{ scope.row.tenant.name }}</div>
             </template>
           </el-table-column>
           <el-table-column label="状态" align="center" prop="enabled">
@@ -281,6 +328,7 @@ import Treeselect from '@riophae/vue-treeselect'
 import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+import Avatar from '@/assets/images/avatar.png'
 
 let userRoles = []
 let userJobs = []
@@ -371,11 +419,12 @@ export default {
           { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
         ],
         phone: [{ required: true, trigger: 'blur', validator: validPhone }]
-      }
+      },
+      Avatar: Avatar
     }
   },
   computed: {
-    ...mapGetters(['user'])
+    ...mapGetters(['user', 'baseApi'])
   },
   created() {
     this.crud.msg.add = '新增成功，默认密码：123456'
@@ -629,5 +678,15 @@ export default {
 ::v-deep .vue-treeselect__single-value {
   height: 30px;
   line-height: 30px;
+}
+
+.tag {
+  margin-right: 5px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 </style>

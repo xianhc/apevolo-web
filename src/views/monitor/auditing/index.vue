@@ -23,27 +23,35 @@
           <el-tag
             v-if="scope.row.executionDuration <= 200"
             type="success"
-          >{{ scope.row.executionDuration }}ms</el-tag>
+          >{{ scope.row.executionDuration }}ms
+          </el-tag>
           <el-tag
             v-else-if="scope.row.executionDuration <= 500"
-          >{{ scope.row.executionDuration }}ms</el-tag>
+          >{{ scope.row.executionDuration }}ms
+          </el-tag>
           <el-tag
             v-else-if="scope.row.executionDuration <= 1000"
             type="warning"
-          >{{ scope.row.executionDuration }}ms</el-tag>
+          >{{ scope.row.executionDuration }}ms
+          </el-tag>
           <el-tag
             v-else
             type="danger"
-          >{{ scope.row.executionDuration }}ms</el-tag>
+          >{{ scope.row.executionDuration }}ms
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="requestUrl" label="请求路径" />
       <el-table-column prop="description" label="描述" />
       <el-table-column prop="method" label="请求方法" />
-      <el-table-column prop="responseData" label="请求参数" width="80px;">
+      <el-table-column prop="requestParameters" label="请求参数" width="80px;">
         <template #default="scope">
           <div>
-            <el-popover v-if="scope.row.requestParameters && scope.row.requestParameters.trim() !== '{}'" placement="left-start" trigger="click">
+            <el-popover
+              v-if="scope.row.requestParameters && scope.row.requestParameters.trim() !== '{}'"
+              placement="left-start"
+              trigger="click"
+            >
               <div class="popover-box">
                 <pre>{{ convertToJson(scope.row.requestParameters) }}</pre>
               </div>
@@ -58,7 +66,11 @@
       <el-table-column prop="responseData" label="响应" width="80px;">
         <template #default="scope">
           <div>
-            <el-popover v-if="scope.row.responseData && scope.row.responseData.trim() !== '{}'" placement="left-start" trigger="click">
+            <el-popover
+              v-if="scope.row.responseData && scope.row.responseData.trim() !== '{}'"
+              placement="left-start"
+              trigger="click"
+            >
               <div class="popover-box">
                 <pre>{{ convertToJson(scope.row.responseData) }}</pre>
               </div>
@@ -129,6 +141,7 @@ export default {
   scrollbar-width: thin;
 
 }
+
 .popover-box::-webkit-scrollbar {
   display: none;
 }
