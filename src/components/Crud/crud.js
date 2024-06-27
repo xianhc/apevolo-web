@@ -367,7 +367,7 @@ function CRUD(options) {
     },
     // 每页条数改变
     sizeChangeHandler(e) {
-      crud.pagination.pages = e
+      crud.pagination.pageSize = e
       crud.pagination.pageIndex = 1
       crud.refresh()
     },

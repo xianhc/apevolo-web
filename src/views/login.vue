@@ -66,7 +66,7 @@
 
 <script>
 import { encrypt } from '@/utils/rsaEncrypt'
-import { getCaptcha } from '@/api/login'
+import { getLoginCaptcha } from '@/api/code'
 import qs from 'qs'
 import Background from '@/assets/images/background.png'
 
@@ -112,7 +112,7 @@ export default {
   },
   methods: {
     getCaptcha() {
-      getCaptcha().then(res => {
+      getLoginCaptcha().then(res => {
         this.codeUrl = res.img
         this.loginForm.captchaId = res.captchaId
       })

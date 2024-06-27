@@ -9,11 +9,9 @@ export function getDepts(params) {
 }
 
 export function getDeptSuperior(id) {
-  const idCollection = { idArray: [id] }
   return request({
-    url: 'api/dept/superior',
-    method: 'post',
-    data: idCollection
+    url: 'api/dept/superior?id=' + id,
+    method: 'get'
   })
 }
 

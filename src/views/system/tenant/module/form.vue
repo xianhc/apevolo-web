@@ -116,6 +116,7 @@ import CRUD, { form } from '@crud/crud'
 
 const defaultForm = {
   id: null,
+  tenantId: null,
   name: '',
   description: '',
   tenantType: 1,
@@ -127,7 +128,7 @@ export default {
   mixins: [form(defaultForm)],
   props: {
     dict: {
-      type: Array,
+      type: Object,
       required: true
     }
   },

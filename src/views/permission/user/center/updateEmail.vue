@@ -1,10 +1,19 @@
 <template>
   <div style="display: inline-block;">
-    <el-dialog :visible.sync="dialog" :close-on-click-modal="false" :before-close="cancel" :title="title" append-to-body width="475px" @close="cancel">
+    <el-dialog
+      :visible.sync="dialog"
+      :close-on-click-modal="false"
+      :before-close="cancel"
+      :title="title"
+      append-to-body
+      width="475px"
+      @close="cancel"
+    >
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="88px">
         <el-form-item label="新邮箱" prop="email">
           <el-input v-model="form.email" auto-complete="on" style="width: 200px;" />
-          <el-button :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
+          <el-button :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}
+          </el-button>
         </el-form-item>
         <el-form-item label="验证码" prop="code">
           <el-input v-model="form.code" style="width: 320px;" />
@@ -25,7 +34,8 @@
 import store from '@/store'
 import { validEmail } from '@/utils/validate'
 import { updateEmail } from '@/api/permission/user'
-import { resetEmail } from '@/api/system/code'
+import { resetEmail } from '@/api/code'
+
 export default {
   props: {
     email: {
@@ -110,7 +120,8 @@ export default {
               duration: 1500,
               center: true
             })
-            store.dispatch('GetInfo').then(() => {})
+            store.dispatch('GetInfo').then(() => {
+            })
           }).catch(err => {
             this.loading = false
             console.log(err.response.data.message)

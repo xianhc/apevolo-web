@@ -16,11 +16,9 @@ export function getMenus(params) {
 }
 
 export function getMenuSuperior(id) {
-  const idCollection = { idArray: [id] }
   return request({
-    url: 'api/menu/superior',
-    method: 'post',
-    data: idCollection
+    url: 'api/menu/superior?id=' + id,
+    method: 'get'
   })
 }
 

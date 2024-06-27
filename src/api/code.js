@@ -7,9 +7,9 @@ export function resetEmail(data) {
   })
 }
 
-export function updatePass(pass) {
+export function getLoginCaptcha() {
   return request({
-    url: 'api/users/updatePass/' + pass,
+    url: 'auth/captcha',
     method: 'get'
   })
 }

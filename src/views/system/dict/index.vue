@@ -16,6 +16,19 @@
         size="small"
         label-width="80px"
       >
+        <el-form-item label="字典类型" prop="dictType">
+          <el-select
+            v-model="form.dictType"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in dict.dict_type"
+              :key="item.value"
+              :label="item.label"
+              :value="parseInt(item.value)"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="字典名称" prop="name">
           <el-input v-model="form.name" style="width: 370px" />
         </el-form-item>
@@ -29,7 +42,8 @@
           :loading="crud.status.cu === 2"
           type="primary"
           @click="crud.submitCU"
-        >确认</el-button>
+        >确认
+        </el-button>
       </div>
     </el-dialog>
     <!-- 字典列表 -->
@@ -56,6 +70,9 @@
                 class="filter-item"
                 @keyup.enter.native="crud.toQuery"
               />
+              <el-select v-model="query.dictType" clearable size="small" placeholder="字典类型" class="filter-item" style="width: 150px" @change="crud.toQuery">
+                <el-option v-for="item in dict.dict_type" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
               <rrOperation />
             </div>
             <crudOperation :permission="permission" />
@@ -70,7 +87,12 @@
             @selection-change="crud.selectionChangeHandler"
             @current-change="handleCurrentChange"
           >
-            <el-table-column type="selection" width="55" />
+            <el-table-column type="selection" :selectable="checkboxT" width="55" />
+            <el-table-column
+              prop="dictType"
+              :formatter="(row, column, cellValue) => getDictTypeText(cellValue)"
+              label="字典类型"
+            />
             <el-table-column
               :show-overflow-tooltip="true"
               prop="name"
@@ -82,14 +104,14 @@
               label="描述"
             />
             <el-table-column
-              v-if="checkPer(['admin', 'dict:edit', 'dict:del'])"
+              v-if="checkPer(['admin', 'dict_edit', 'dict_del'])"
               label="操作"
               width="130px"
               align="center"
               fixed="right"
             >
               <template slot-scope="scope">
-                <udOperation :data="scope.row" :permission="permission" />
+                <udOperation :data="scope.row" :permission="permission" :disabled-edit="scope.row.id === '1306054134645919763'" :disabled-dle="scope.row.id === '1306054134645919763'" />
               </template>
             </el-table-column>
           </el-table>
@@ -114,7 +136,8 @@
               type="primary"
               icon="el-icon-plus"
               @click="$refs.dictDetail && $refs.dictDetail.crud.toAdd()"
-            >新增</el-button>
+            >新增
+            </el-button>
           </div>
           <dictDetail ref="dictDetail" :permission="permission" />
         </el-card>
@@ -134,6 +157,7 @@ import udOperation from '@crud/UD.operation'
 
 const defaultForm = {
   id: null,
+  dictType: null,
   name: null,
   description: null,
   dictDetails: []
@@ -158,6 +182,7 @@ export default {
     ]
   },
   mixins: [presenter(), header(), form(defaultForm)],
+  dicts: ['dict_type'],
   data() {
     return {
       queryTypeOptions: [
@@ -165,7 +190,8 @@ export default {
         { key: 'description', display_name: '描述' }
       ],
       rules: {
-        name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+        dictType: [{ required: true, message: '请选择字典类型', trigger: 'blur' }]
       },
       permission: {
         add: ['dict_add'],
@@ -190,6 +216,22 @@ export default {
         this.$refs.dictDetail.dictId = val.id
         this.$refs.dictDetail.crud.toQuery()
       }
+    },
+    getDictTypeText(value) {
+      try {
+        const dictList = this.dict.dict_type
+        const keys = Object.keys(dictList)
+        const foundKey = keys.find(key => dictList[key].value === value.toString())
+        if (foundKey) {
+          return dictList[foundKey].label
+        }
+        return value
+      } catch (err) {
+        return value
+      }
+    },
+    checkboxT(row, rowIndex) {
+      return row.id !== '1306054134645919763'
     }
   }
 }

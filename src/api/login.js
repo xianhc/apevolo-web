@@ -30,13 +30,6 @@ export function getInfo() {
   })
 }
 
-export function getCaptcha() {
-  return request({
-    url: 'auth/captcha',
-    method: 'get'
-  })
-}
-
 export function logout() {
   return request({
     url: 'auth/logout',
