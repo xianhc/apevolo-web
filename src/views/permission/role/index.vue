@@ -49,33 +49,57 @@
             style="width: 145px"
           />
         </el-form-item>
-        <el-form-item label="数据范围" prop="dataScope">
+        <!--        <el-form-item label="数据范围" prop="dataScope">-->
+        <!--          <el-select-->
+        <!--            v-model="form.dataScope"-->
+        <!--            style="width: 140px"-->
+        <!--            placeholder="请选择数据范围"-->
+        <!--            @change="changeScope"-->
+        <!--          >-->
+        <!--            <el-option-->
+        <!--              v-for="item in dateScopes"-->
+        <!--              :key="item"-->
+        <!--              :label="item"-->
+        <!--              :value="item"-->
+        <!--            />-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
+        <el-form-item label="数据权限" prop="dataScopeType">
           <el-select
-            v-model="form.dataScope"
-            style="width: 140px"
-            placeholder="请选择数据范围"
+            v-model="form.dataScopeType"
+            style="width: 145px"
+            placeholder="请选择"
             @change="changeScope"
           >
             <el-option
-              v-for="item in dateScopes"
-              :key="item"
-              :label="item"
-              :value="item"
+              v-for="item in dict.data_scope_type"
+              :key="item.value"
+              :label="item.label"
+              :value="parseInt(item.value)"
             />
           </el-select>
         </el-form-item>
         <el-form-item
-          v-if="form.dataScope === '自定义'"
+          v-if="form.dataScopeType === 5"
           label="数据权限"
-          prop="depts"
         >
-          <treeselect
-            v-model="deptDatas"
-            :load-options="loadDepts"
-            :options="depts"
-            multiple
-            style="width: 380px"
-            placeholder="请选择"
+          <!--          <treeselect-->
+          <!--            v-model="deptDatas"-->
+          <!--            :load-options="loadDepts"-->
+          <!--            :options="depts"-->
+          <!--            multiple-->
+          <!--            style="width: 380px"-->
+          <!--            placeholder="请选择"-->
+          <!--          />-->
+          <el-tree
+            ref="dept"
+            :data="deptTree"
+            :default-checked-keys="deptIds"
+            :props="defaultProps"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            check-strictly
           />
         </el-form-item>
         <el-form-item label="描述信息" prop="description">
@@ -93,7 +117,8 @@
           :loading="crud.status.cu === 2"
           type="primary"
           @click="crud.submitCU"
-        >确认</el-button>
+        >确认
+        </el-button>
       </div>
     </el-dialog>
     <el-row :gutter="15">
@@ -125,7 +150,11 @@
             />
             <el-table-column prop="name" label="角色名称" />
             <el-table-column prop="permission" label="角色代码" />
-            <el-table-column prop="dataScope" label="数据权限" />
+            <el-table-column
+              prop="dataScopeType"
+              :formatter="(row, column, cellValue) => getDataScopeText(cellValue)"
+              label="数据权限"
+            />
             <el-table-column prop="level" label="角色级别" />
             <el-table-column
               :show-overflow-tooltip="true"
@@ -178,7 +207,8 @@
                   style="float: right;"
                   type="primary"
                   @click="saveMenu"
-                >保存</el-button>
+                >保存
+                </el-button>
               </div>
               <el-tree
                 ref="menu"
@@ -210,7 +240,8 @@
                   style="float: right;"
                   type="primary"
                   @click="saveApi"
-                >保存</el-button>
+                >保存
+                </el-button>
               </div>
               <el-tree
                 ref="api"
@@ -232,29 +263,27 @@
 
 <script>
 import crudRoles from '@/api/permission/role'
-import { getDepts, getDeptSuperior } from '@/api/permission/dept'
+import { getDeptsTree } from '@/api/permission/dept'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import DateRangePicker from '@/components/DateRangePicker'
 
 const defaultForm = {
   id: null,
   name: null,
+  permission: null,
   depts: [],
   description: null,
-  dataScope: '全部',
+  dataScopeType: null,
   level: 3
 }
 export default {
   name: 'Role',
   components: {
-    Treeselect,
     pagination,
     crudOperation,
     rrOperation,
@@ -270,22 +299,22 @@ export default {
     })
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
+  dicts: ['data_scope_type'],
   data() {
     return {
       filterMenuText: '',
       filterApiText: '',
       defaultProps: { children: 'children', label: 'label', isLeaf: 'leaf' },
-      dateScopes: ['全部', '本级', '自定义'],
       level: 3,
       currentId: 0,
       menuLoading: false,
       showButton: false,
       menus: [],
       apis: [],
+      deptTree: [],
       menuIds: [],
       apisIds: [],
-      depts: [],
-      deptDatas: [], // 多选时使用
+      deptIds: [],
       permission: {
         add: ['role_add'],
         edit: ['role_edit'],
@@ -296,7 +325,8 @@ export default {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         permission: [
           { required: true, message: '请输入权限', trigger: 'blur' }
-        ]
+        ],
+        dataScopeType: [{ required: true, message: '请选择数据权限', trigger: 'blur' }]
       },
       activeName: 'first'
     }
@@ -321,13 +351,6 @@ export default {
     })
   },
   methods: {
-    // getMenuDatas(node, resolve) {
-    //  setTimeout(() => {
-    //    getMenusTree(node.data.id ? node.data.id : 0).then((res) => {
-    //      resolve(res)
-    //    })
-    //  }, 100)
-    // },
     filterMenuNode(value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
@@ -339,37 +362,41 @@ export default {
     [CRUD.HOOK.afterRefresh]() {
       this.$refs.menu.setCheckedKeys([])
     },
-    // 新增前初始化部门信息
+    // 新增前初始化菜单 api信息
     [CRUD.HOOK.beforeToAdd](crud, form) {
-      this.deptDatas = []
       form.menus = null
+      form.apis = null
+      form.permission = null
     },
     // 编辑前初始化自定义数据权限的部门信息
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      this.deptDatas = []
-      if (form.dataScope === '自定义') {
-        this.getSupDepts(form.depts)
+      if (form.dataScopeType === 5) {
+        getDeptsTree().then((data) => {
+          this.deptTree = data
+        })
+        this.deptIds = []
+        form.depts.forEach(data => {
+          this.deptIds.push(data.id)
+        })
       }
-      const _this = this
-      form.depts.forEach(function(dept) {
-        _this.deptDatas.push(dept.id)
-      })
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
-      if (crud.form.dataScope === '自定义' && this.deptDatas.length === 0) {
-        this.$message({
-          message: '自定义数据权限不能为空',
-          type: 'warning'
+      if (crud.form.dataScopeType === 5) {
+        this.deptIds = this.$refs.dept.getCheckedKeys()
+        if (this.deptIds.length === 0) {
+          this.$message({
+            message: '数据权限为自定义,请至少选择一个部门',
+            type: 'warning'
+          })
+          return false
+        }
+        // 得到已选中的 key 值
+        crud.form.depts = []
+        this.deptIds.forEach(function(id) {
+          const dept = { id: id }
+          crud.form.depts.push(dept)
         })
-        return false
-      } else if (crud.form.dataScope === '自定义') {
-        const depts = []
-        this.deptDatas.forEach(function(data) {
-          const dept = { id: data }
-          depts.push(dept)
-        })
-        crud.form.depts = depts
       } else {
         crud.form.depts = []
       }
@@ -378,7 +405,6 @@ export default {
     // 触发单选
     handleCurrentChange(val) {
       if (val) {
-        const _this = this
         // 清空菜单的选中
         this.$refs.menu.setCheckedKeys([])
         this.$refs.api.setCheckedKeys([])
@@ -386,12 +412,12 @@ export default {
         this.currentId = val.id
         // 初始化默认选中的key
         this.menuIds = []
-        val.menus.forEach(function(data) {
-          _this.menuIds.push(data.id)
+        val.menus.forEach(data => {
+          this.menuIds.push(data.id)
         })
         this.apisIds = []
-        val.apis.forEach(function(data) {
-          _this.apisIds.push(data.id)
+        val.apis.forEach(data => {
+          this.apisIds.push(data.id)
         })
         this.showButton = true
       }
@@ -453,58 +479,12 @@ export default {
         }
       })
     },
-    // 获取部门数据
-    getDepts() {
-      getDepts({ enabled: true }).then((res) => {
-        this.depts = res.content.map(function(obj) {
-          if (obj.hasChildren) {
-            obj.children = null
-          }
-          return obj
-        })
-      })
-    },
-    getSupDepts(depts) {
-      const ids = []
-      depts.forEach((dept) => {
-        ids.push(dept.id)
-      })
-      getDeptSuperior(ids).then((res) => {
-        const date = res.content
-        this.buildDepts(date)
-        this.depts = date
-      })
-    },
-    buildDepts(depts) {
-      depts.forEach((data) => {
-        if (data.children) {
-          this.buildDepts(data.children)
-        }
-        if (data.hasChildren && !data.children) {
-          data.children = null
-        }
-      })
-    },
-    // 获取弹窗内部门数据
-    loadDepts({ action, parentNode, callback }) {
-      if (action === LOAD_CHILDREN_OPTIONS) {
-        getDepts({ enabled: true, parentId: parentNode.id }).then((res) => {
-          parentNode.children = res.content.map(function(obj) {
-            if (obj.hasChildren) {
-              obj.children = null
-            }
-            return obj
-          })
-          setTimeout(() => {
-            callback()
-          }, 200)
-        })
-      }
-    },
-    // 如果数据权限为自定义则获取部门数据
+    // 自定义数据权限 加载部门数据
     changeScope() {
-      if (this.form.dataScope === '自定义') {
-        this.getDepts()
+      if (this.form.dataScopeType === 5) {
+        getDeptsTree().then((data) => {
+          this.deptTree = data
+        })
       }
     },
     checkboxT(row) {
@@ -512,12 +492,25 @@ export default {
     },
     handleClick(tab, event) {
       console.log(tab, event)
+    },
+    getDataScopeText(value) {
+      try {
+        const dictList = this.dict.data_scope_type
+        const keys = Object.keys(dictList)
+        const foundKey = keys.find(key => dictList[key].value === value.toString())
+        if (foundKey) {
+          return dictList[foundKey].label
+        }
+        return value
+      } catch (err) {
+        return value
+      }
     }
   }
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style rel='stylesheet/scss' lang='scss'>
 .role-span {
   font-weight: bold;
   color: #303133;
@@ -525,13 +518,15 @@ export default {
 }
 </style>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style rel='stylesheet/scss' lang='scss' scoped>
 ::v-deep .el-input-number .el-input__inner {
   text-align: left;
 }
+
 ::v-deep .vue-treeselect__multi-value {
   margin-bottom: 0;
 }
+
 ::v-deep .vue-treeselect__multi-value-item {
   border: 0;
   padding: 0;

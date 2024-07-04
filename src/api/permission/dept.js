@@ -39,4 +39,11 @@ export function edit(data) {
   })
 }
 
-export default { add, edit, del, getDepts, getDeptSuperior }
+export function getDeptsTree() {
+  return request({
+    url: 'api/dept/queryTree',
+    method: 'get'
+  })
+}
+
+export default { add, edit, del, getDepts, getDeptSuperior, getDeptsTree }
