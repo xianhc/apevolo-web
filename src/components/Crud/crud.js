@@ -408,12 +408,21 @@ function CRUD(options) {
         if (crudFrom.hasOwnProperty(key)) {
           crudFrom[key] = form[key]
         } else {
+          if (['updateBy', 'updateTime'].includes(key)) {
+            continue
+          }
           Vue.set(crudFrom, key, form[key])
         }
       }
       if (crud.findVM('form').$refs['form']) {
         // 页面重复添加信息时，下拉框的校验会存在，需要找工取消
         crud.findVM('form').$refs['form'].clearValidate()
+      }
+      // 删除 crudFrom 中不在 form 里的多余属性
+      for (const key in crudFrom) {
+        if (!form.hasOwnProperty(key)) {
+          Vue.delete(crudFrom, key)
+        }
       }
     },
     /**
