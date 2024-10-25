@@ -133,7 +133,7 @@
         >
           <el-input
             v-model="form.permission"
-            :disabled="form.iframe.toString() === 'true'"
+            :disabled="form.iFrame === true"
             placeholder="权限标识"
             style="width: 178px"
           />
@@ -160,7 +160,7 @@
         </el-form-item>
         <el-form-item
           v-show="
-            form.iframe.toString() !== 'true' && form.type.toString() === '2'
+            form.iFrame !== true && form.type.toString() === '2'
           "
           label="组件名称"
           prop="componentName"
@@ -173,7 +173,7 @@
         </el-form-item>
         <el-form-item
           v-show="
-            form.iframe.toString() !== 'true' && form.type.toString() === '2'
+            form.iFrame !== true && form.type.toString() === '2'
           "
           label="组件路径"
           prop="component"
