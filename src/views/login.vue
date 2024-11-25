@@ -28,7 +28,7 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="captcha">
+      <el-form-item v-if="loginForm.showCaptcha" prop="captcha">
         <el-input
           v-model="loginForm.captcha"
           auto-complete="off"
@@ -80,7 +80,8 @@ export default {
         username: 'apevolo',
         password: '123456',
         captcha: '',
-        captchaId: ''
+        captchaId: '',
+        showCaptcha: true
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
@@ -115,6 +116,7 @@ export default {
       getLoginCaptcha().then(res => {
         this.codeUrl = res.img
         this.loginForm.captchaId = res.captchaId
+        this.loginForm.showCaptcha = res.showCaptcha
       })
     },
     handleLogin() {
