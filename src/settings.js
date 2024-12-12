@@ -30,7 +30,7 @@ module.exports = {
   /**
    * 底部文字，支持html语法
    */
-  footerTxt: '© 2020 ApeVolo <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License 2.0</a>',
+  footerTxt: '© 2024 <a style="color: #409EFF !important;font-weight: 700 !important;" href="https://github.com/xianhc/ape-volo-web" target="_blank">ApeVoloAdmin</a> Copyright <a style="color: #409EFF !important;font-weight: 700 !important;" href="https://github.com/xianhc" target="_blank">XianHaoChun</a>',
   /**
    * 备案号
    */
